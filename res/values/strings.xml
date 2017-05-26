@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">UsbTP</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="button_id">版本号</string>
+    <string name="button_setting">设置</string>
+    <string name="button_hardware">硬件检测</string>
+    <string name="button_upgrade">固件升级</string>
+    <string name="button_checksum">校验</string>
+
+    <string-array name="screen_size">
+        <item>67(256*128)</item>
+    </string-array>
+    <string-array name="orientation">
+        <item>无旋转</item>
+        <item>顺时针90</item>
+        <item>逆时针90</item>
+        <item>顺时针90(镜像)</item>
+        <item>逆时针90(镜像)</item>
+    </string-array>
+
+    <string name="setting_title">设置</string>
+    <string name="msg_setting_initing">正在初始化</string>
+    <string name="device_open_succ">打开成功</string>
+    <string name="device_open_err">打开失败</string>
+    <string name="device_no_found">未找到设备</string>
+    <string name="device_found">找到设备</string>
+    <string name="device_opend">设备已经打开</string>
+    <string name="device_no_open">设备还未打开</string>
+    <string name="device_close">关闭设备</string>
+    <string name="get_id_fail">获取ID失败</string>
+    <string name="msg_device_need_permission">需要USB权限</string>
+    <string name="msg_device_request_permission_err">获取USB权限失败</string>
+    <string name="msg_device_request_permission_succ">获取USB权限成功</string>
+    <string name="msg_erase_board_err">清除配置信息失败</string>
+    <string name="msg_erase_board_succ">清除配置信息成功</string>
+    <string name="msg_write_board_err">写入配置信息成功</string>
+    <string name="msg_write_board_succ">写入配置信息失败</string>
+    <string name="msg_read_board_err">读取配置信息成功</string>
+    <string name="msg_read_board_succ">读取配置信息成功</string>
+    <string name="msg_erase_cal_err">清除校准信息失败</string>
+    <string name="msg_erase_cal_succ">清除校准信息成功</string>
+    <string name="msg_write_cal_err">写入校准信息失败</string>
+    <string name="msg_write_cal_succ">写入校准信息成功</string>
+    <string name="msg_read_cal_err">读取校准信息失败</string>
+    <string name="msg_read_cal_succ">读取校准信息成功</string>
+    <string name="msg_setting_init_err">初始化失败</string>
+    <string name="msg_setting_init_succ">初始化成功</string>
+    <string name="msg_setting_ok_err">配置失败</string>
+    <string name="msg_setting_ok_succ">配置成功</string>
+    <string name="msg_setting_reset_err">重置失败</string>
+    <string name="msg_setting_reset_succ">重置成功</string>
+    <string name="msg_setting_clear_err">清除校验失败</string>
+    <string name="msg_setting_clear_succ">清除校验成功</string>
+    <string name="msg_set_mode_err">切换set模式失败</string>
+    <string name="msg_set_mode_succ">切换set模式成功</string>
+    <string name="msg_touch_mode_err">切换touch模式失败</string>
+    <string name="msg_touch_mode_succ">切换touch模式成功</string>
+    <string name="msg_upgrade_err">更新固件失败</string>
+    <string name="msg_upgrade_succ">更新固件成功</string>
+    <string name="msg_file_invaild">文件无效</string>
+    <string name="msg_open_normal_err">打开设备失败</string>
+    <string name="msg_open_normal_succ">打开设备成功</string>
+    <string name="msg_open_boot_err">打开启动设备失败</string>
+    <string name="msg_open_boot_succ">打开启动设备成功</string>
+    <string name="msg_device_attach">接入设备</string>
+    <string name="msg_device_detach">拔出设备</string>
+    <string name="menu_title_x_all">X-全部</string>
+    <string name="menu_title_y_all">Y-全部</string>
+    <string name="menu_title_threshold">设置阈值</string>
+    <string name="upgrade_check_file">正在检验文件</string>
+    <string name="upgrade_switch_boot">正在切换烧录环境</string>
+    <string name="upgrade_switch_nomal">正在切换工作环境</string>
+    <string name="upgrade_write_data">正在写入数据</string>
+    <string name="upgrade_write_finish">写入数据完成</string>
+    <string name="upgrade_finish">烧录完成</string>
+    <string name="upgrade_timeout">烧录超时</string>
+    <string name="upgrade_err">烧录错误</string>
+    <string name="upgrade_ensure">确认升级?</string>
+    <string name="ok">确认</string>
+    <string name="cancel">取消</string>
+    
+    <string name="cal_timeout">超时</string>
+    <string name="cal_working">正在采集</string>
+    <string name="cal_touch_notice">请按屏幕图案上的点</string>
+    <string name="cal_touch_finish">采集完成</string>
+    <string name="cal_touch_exit">校验成功\n点击退出</string>
+    <string name="cal_finish">校准完成</string>
+    <string name="cal_err">校准失败\n点击退出</string>
+
+</resources>

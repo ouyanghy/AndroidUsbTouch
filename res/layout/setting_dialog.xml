@@ -1,0 +1,119 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" 
+	android:layout_marginLeft="12dp"
+	android:layout_marginRight="12dp"
+	android:layout_marginTop="4dp"
+	android:layout_marginBottom="4dp"
+    >
+
+
+
+    <TextView
+        android:id="@+id/textViewCalTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="尺寸信息" />
+
+    <View
+   
+        android:layout_width="wrap_content"
+        android:layout_height="2dp"
+        android:background="#CCCCCC" />
+
+    <Spinner
+        android:id="@+id/spinnerScreenSize"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:entries="@array/screen_size" />
+
+    <TextView
+           android:layout_marginTop="8dp"
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="屏幕模式" />
+        <View
+        android:layout_width="wrap_content"
+        android:layout_height="2dp"
+        android:background="#CCCCCC" />
+    
+
+    <RadioGroup
+           android:layout_marginTop="8dp"
+        android:id="@+id/radioGroup1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+         >
+
+        <RadioButton
+            android:id="@+id/radioHor"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="横屏" />
+
+        <RadioButton
+            android:id="@+id/radioVer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="竖屏" />
+
+
+    </RadioGroup>
+
+    <Spinner
+        android:id="@+id/spinnerOre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/orientation" />
+
+    <View
+        android:layout_width="wrap_content"
+        android:layout_height="2dp"
+        android:background="#CCCCCC" />
+
+    <LinearLayout
+        android:layout_marginTop="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Button
+            android:id="@+id/buttonSettingCalClear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="清除校验" />
+
+        <Button
+            android:id="@+id/buttonSettingReset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="重置" />
+
+        <Button
+            android:id="@+id/buttonSettingOk"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="确定" />
+
+        <Button
+            android:id="@+id/buttonSettingCancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="取消" />
+
+    </LinearLayout>
+<View
+    android:layout_marginTop="8dp"
+        android:layout_width="wrap_content"
+        android:layout_height="2dp"
+        android:background="#CCCCCC" />
+</LinearLayout>
