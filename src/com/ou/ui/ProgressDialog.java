@@ -6,6 +6,7 @@ import com.ou.usbtp.DetectUsbThread;
 import com.ou.usbtp.Function;
 import com.ou.usbtp.R;
 import com.ou.usbtp.UpgradeThread;
+import com.ou.view.ProgressView;
 
 import android.app.Dialog;
 import android.content.Context;

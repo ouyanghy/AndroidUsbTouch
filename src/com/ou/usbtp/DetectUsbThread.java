@@ -91,7 +91,7 @@ public class DetectUsbThread extends Thread {
 		// mTv.setText("≥ı ºªØ\n");
 		if (mUsb.isAvail() == false) {
 			sendMessage(R.string.device_no_found);
-			Common.log("device is invalid");
+			//Common.log("device is invalid");
 			return;
 		} else
 			sendMessage(R.string.device_found);

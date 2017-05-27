@@ -1,4 +1,4 @@
-package com.ou.ui;
+package com.ou.view;
 
 import com.ou.common.Common;
 import com.ou.usbtp.BoardConfig;

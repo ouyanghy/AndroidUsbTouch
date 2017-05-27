@@ -6,6 +6,7 @@ import com.ou.usbtp.BoardConfig;
 import com.ou.usbtp.HardwareSignal;
 import com.ou.usbtp.HardwareTestWorkThread;
 import com.ou.usbtp.R;
+import com.ou.view.HardwareTestView;
 
 import android.app.Activity;
 import android.app.Dialog;

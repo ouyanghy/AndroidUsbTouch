@@ -61,10 +61,10 @@
             android:layout_height="wrap_content" >
 
             <Button
-                android:id="@+id/Test"
+                android:id="@+id/buttonKeyset"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="test" />
+                android:text="快捷键" />
 
             <Button
                 android:id="@+id/buttonHardwareTest"

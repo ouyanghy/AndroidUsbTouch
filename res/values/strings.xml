@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">UsbTP</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="app_name">红外触摸</string>
     <string name="action_settings">Settings</string>
     <string name="button_id">版本号</string>
     <string name="button_setting">设置</string>
@@ -90,4 +89,6 @@
     <string name="cal_finish">校准完成</string>
     <string name="cal_err">校准失败\n点击退出</string>
 
+     <string name="shortcut_note_example">红色圈为示意,请点击实际快捷键的对应位置</string>
+      <string name="shortcut_note_tip">请用触摸笔垂直点击十字星中心,进行校准</string>
 </resources>

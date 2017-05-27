@@ -41,7 +41,7 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 		mBtnClose = (Button) findViewById(R.id.buttonClose);
 		mBtnId = (Button) findViewById(R.id.buttonId);
 		mBtnSetting = (Button) findViewById(R.id.buttonSetting);
-		mBtnTest = (Button) findViewById(R.id.Test);
+		mBtnTest = (Button) findViewById(R.id.buttonKeyset);
 		mBtnHardwareTest = (Button) findViewById(R.id.buttonHardwareTest);
 		mBtnCal = (Button) findViewById(R.id.buttonCal);
 		mBtnUpgrade = (Button) findViewById(R.id.buttonUpgrde);
@@ -134,8 +134,8 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 			startActivity(intent);
 			
 			break;
-		case R.id.Test:
-		
+		case R.id.buttonKeyset:
+			startActivity(new Intent(this, ShortCutActivity.class));
 			break;
 			
 		case R.id.buttonCal:
@@ -203,6 +203,7 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
 		intent.setType("*/*");
 		intent.addCategory(Intent.CATEGORY_OPENABLE);
+		
 
 		try {
 			startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"),FILE_SELECT_CODE);

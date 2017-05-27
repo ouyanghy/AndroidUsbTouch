@@ -8,7 +8,7 @@
 
     >
 
-    <com.ou.ui.ProgressView
+    <com.ou.view.ProgressView
         android:layout_gravity="center_horizontal"
         android:id="@+id/progressView"
         android:layout_width="wrap_content"

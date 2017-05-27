@@ -8,10 +8,10 @@
 
     >
 
-    <com.ou.view.HardwareTestView
-        android:id="@+id/hardwareView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        match_parent="" />
+    <com.ou.view.ShortCutView
+        android:id="@+id/shortCutView"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+ />
 
 </LinearLayout>
