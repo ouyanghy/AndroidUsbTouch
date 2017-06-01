@@ -1,4 +1,4 @@
-package com.ou.usbtp;
+package com.ou.base;
 
 public interface CallBack {
 	void call();

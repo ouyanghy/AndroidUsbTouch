@@ -1,16 +1,17 @@
-package com.ou.usbtp;
+package com.ou.base;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import com.ou.common.Common;
-import com.ou.common.Enums;
+import com.ou.common.ComFunc;
+import com.ou.common.Constant;
+import com.ou.usbtp.R;
 
 import android.content.Context;
 import android.graphics.PointF;
 
-public class Function extends Enums {
+public class Function extends Constant {
 	private Device mUsb;
 	private static Function mThis = null;
 
@@ -37,7 +38,7 @@ public class Function extends Enums {
 	
 	public String  getShortDesc(Context context) {
 		if (getTpUsbFunction() == null)
-			return Common.getString(context, R.string.device_no_found);
+			return ComFunc.getString(context, R.string.device_no_found);
 		return mUsb.getShortDesc();
 	}
 	/* private function */
@@ -97,7 +98,7 @@ public class Function extends Enums {
 	private byte[] getImageCommandHead(int mode, int len) {
 		byte[] bs = new byte[8];
 		byte addr = 0;
-		Common.memset(bs, 0x00, bs.length);
+		ComFunc.memset(bs, 0x00, bs.length);
 		bs[0] = (byte) REPORT_ID_OUT_CMD;
 		bs[1] = (byte) CMD_GET_IMAGE;
 
@@ -124,19 +125,19 @@ public class Function extends Enums {
 			return null;
 		}
 
-		Common.sleep(20);
+		ComFunc.sleep(20);
 		int addr = (FW_VERSION_ADDR + 4) | EXTERNAL_FLASH_ADDRESS;
 		byte[] command_id = getReadCommandHead(addr, 4);
 
 		ret = mUsb.sendCommand(command_id, command_id.length);
 		if (ret == null) {
-			Common.log("send command_id fail", command_id, command_id.length);
+			ComFunc.log("send command_id fail", command_id, command_id.length);
 			return null;
 		}
-		Common.sleep(20);
+		ComFunc.sleep(20);
 		ret = recvResult();
 		if (ret == null) {
-			Common.log("recv command_id fail");
+			ComFunc.log("recv command_id fail");
 			return null;
 		}
 		return ret;
@@ -150,10 +151,10 @@ public class Function extends Enums {
 		if (ret == null)
 			return null;
 
-		Common.sleep(20);
+		ComFunc.sleep(20);
 		ret = recvResult();
 		if (ret == null) {
-			Common.log("recv command_id fail");
+			ComFunc.log("recv command_id fail");
 			return null;
 		}
 		return ret;
@@ -163,7 +164,7 @@ public class Function extends Enums {
 	public byte[] switchMode(int mode) {
 		byte[] bs = { REPORT_ID_OUT_CMD, CMD_SET_MODE, (byte) mode };
 		byte[] ret = mUsb.sendCommand(bs, bs.length);
-		Common.sleep(20);
+		ComFunc.sleep(20);
 		ret = recvResult();
 
 		return ret;
@@ -185,7 +186,7 @@ public class Function extends Enums {
 		if (bs == null)
 			return null;
 
-		byte []data = Common.memcut(bs, 8, bs.length - 8);
+		byte []data = ComFunc.memcut(bs, 8, bs.length - 8);
 		cal.parse(data);
 		return cal;
 	}
@@ -202,7 +203,7 @@ public class Function extends Enums {
 			return null;
 		}
 
-		Common.sleep(40);
+		ComFunc.sleep(40);
 
 		ret = recvResult();
 		if (ret == null)
@@ -228,12 +229,12 @@ public class Function extends Enums {
 	private byte[] recvResult(int len) {
 		int cnt = 0;
 		byte[] ret;
-		Common.sleep(20);
+		ComFunc.sleep(20);
 		do {
 			ret = mUsb.recvResult(len);
 			if (ret == null) {
 				if (cnt++ < 3) {
-					Common.sleep(20);
+					ComFunc.sleep(20);
 					continue;
 				} else {
 					break;
@@ -243,9 +244,9 @@ public class Function extends Enums {
 
 			// Common.log("ret1:" + ret[1]);
 			if (ret[1] == 0xff || ret[1] == -1) {
-				Common.sleep(20);
+				ComFunc.sleep(20);
 				// Common.log("recvResult error retry");
-				Common.log("retry recv cnt:" + cnt);
+				ComFunc.log("retry recv cnt:" + cnt);
 			} else {
 				cnt = 3;
 			}
@@ -266,7 +267,7 @@ public class Function extends Enums {
 		byte[] ret = mUsb.sendCommand(command, command.length);
 		if (ret == null)
 			return null;
-		Common.sleep(40);
+		ComFunc.sleep(40);
 		ret = recvResult();
 
 		return ret;
@@ -280,79 +281,63 @@ public class Function extends Enums {
 		return true;
 	}
 
-	public byte[] eraseBroadInfo() {
+	public byte[] __eraseBroadInfo() {
 		int addr = BOARD_INFO_ADDR | EXTERNAL_FLASH_ADDRESS;
 
 		byte[] head = getEraseHead(addr, 1);
 		if (head == null) {
-			Common.log("erase broadinfo fail");
+			ComFunc.log("erase broadinfo fail");
 			return null;
 		}
 
 		byte[] ret = mUsb.sendCommand(head, head.length);
 		if (ret == null) {
-			Common.log("erase broadinfo sendCommand fail");
+			ComFunc.log("erase broadinfo sendCommand fail");
 			return null;
 		}
 
-		Common.sleep(40);
-		Common.log("enter==>");
+	//	ComFunc.sleep(40);
+		//ComFunc.log("enter==>");
 		ret = recvResult();
-		Common.log("exit<==");
+		//ComFunc.log("exit<==");
 		return ret;
 	}
 
-	public byte[] writeBroadInfo(BoardConfig con) {
+	public boolean eraseBroadInfo() {
+		byte [] ret = __eraseBroadInfo();
+		if (ret == null)
+			return false;
+		return true;
+	}
+	
+	public boolean writeBroadInfo(BoardConfig con) {
+		byte []ret = __writeBroadInfo(con);
+		if (ret == null)
+			return false;
+		
+		return true;
+	}
+	public byte[] __writeBroadInfo(BoardConfig con) {
 		/* write config */
 
 		byte[] config = con.getBuffer();
-		int len = config.length;
 		int size = con.getSize();
-		int addr = 0;
-		int addr_org = (BOARD_INFO_ADDR + 4) | EXTERNAL_FLASH_ADDRESS;
-
-		int roundDownLen = Common.roundDown(len, PACKAGE_SEND_LENGTH_LIMIT);
-		for (int i = 0; i < roundDownLen; i += PACKAGE_SEND_LENGTH_LIMIT) {
-
-			addr = addr_org + i;
-			byte[] data = Common.memcut(config, i, PACKAGE_SEND_LENGTH_LIMIT);
-			byte[] command = getWriteCommandHead(addr, PACKAGE_SEND_LENGTH_LIMIT, data);
-			byte[] ret = mUsb.sendCommand(command, command.length);
-			if (ret == null)
-				return null;
-			Common.sleep(40);
-
-			ret = recvResult();
-
-		}
-
-		/* send config left */
-		int remain = len - roundDownLen;
-		if (remain > 0) {
-			addr = addr_org + roundDownLen;
-			byte[] data = Common.memcut(config, roundDownLen, remain);
-			byte[] command = getWriteCommandHead(addr, remain, data);
-			byte[] ret = mUsb.sendCommand(command, command.length);
-			if (ret == null)
-				return null;
-
-			Common.sleep(20);
-			ret = recvResult();
-			if (ret == null)
-				return null;
-		}
+		int addr = (BOARD_INFO_ADDR + 4) | EXTERNAL_FLASH_ADDRESS;
+		
+		byte [] ret = sendBlockData(addr, config, config.length);
+		if (ret == null)
+			return null;
 
 		/* write screen size */
 		byte[] bs = new byte[4];
-		Common.memset(bs, 0x00, bs.length);
+		ComFunc.memset(bs, 0x00, bs.length);
 		bs[0] = (byte) (size & 0xff);
 		bs[1] = (byte) ((size & 0xff00) >> 8);
 		addr = (BOARD_INFO_ADDR) | EXTERNAL_FLASH_ADDRESS;
 		byte[] command = getWriteCommandHead(addr, bs.length, bs);
-		byte[] ret = mUsb.sendCommand(command, command.length);
+		 ret = mUsb.sendCommand(command, command.length);
 		if (ret == null)
 			return null;
-		Common.sleep(20);
 
 		ret = recvResult();
 
@@ -365,7 +350,7 @@ public class Function extends Enums {
 		byte[] ret = mUsb.sendCommand(command, command.length);
 		if (ret == null)
 			return -1;
-		Common.sleep(20);
+		ComFunc.sleep(20);
 		ret = recvResult();
 		if (ret == null)
 			return -1;
@@ -376,15 +361,35 @@ public class Function extends Enums {
 		return size;
 	}
 
-	public byte[] readBroadInfo() {
+	public BoardConfig readBroadInfo() {
+		int size = readBroadInfoScreenSize();
+		if (size < 0) {
+			ComFunc.log("get size fail");
+			return null;
+		}
+		// Common.log("===size:" + size);
+		ComFunc.sleep(20);
+		byte[] buf = __readBroadInfo();
+		if (buf == null) {
+			return null;
+		}
+
+		BoardConfig read_ic = new BoardConfig(Constant.READ_FROM_IC);
+		read_ic.setBuffer(buf);
+		read_ic.setSize(size);
+		
+		return read_ic;
+	}
+
+	private byte[] __readBroadInfo() {
 		int addr = 0;
 		int addr_start = (BOARD_INFO_ADDR + 4) | EXTERNAL_FLASH_ADDRESS;
 		int len = 146;
 		int offset = 0;
 		byte[] command;
-		int roundUpLen = Common.roundUp(len, PACKAGE_RECV_LENGTH_DATA_LIMIT);
+		int roundUpLen = ComFunc.roundUp(len, PACKAGE_RECV_LENGTH_DATA_LIMIT);
 		byte[] rcv = new byte[roundUpLen];
-		Common.memset(rcv, 0x00, rcv.length);
+		ComFunc.memset(rcv, 0x00, rcv.length);
 
 		for (int i = 0; i < roundUpLen; i += PACKAGE_RECV_LENGTH_DATA_LIMIT) {
 			addr = addr_start + i;
@@ -394,21 +399,21 @@ public class Function extends Enums {
 			if (ret == null)
 				return null;
 
-			Common.sleep(40);
+			ComFunc.sleep(40);
 			ret = recvResult();
 			if (ret == null) {
-				Common.log("recv command_id fail");
+				ComFunc.log("recv command_id fail");
 				return null;
 			}
 			offset = i;
-			Common.log("offset:" + offset);
-			Common.memcpy(rcv, ret, offset, PACKAGE_RECV_DATA_START, PACKAGE_RECV_LENGTH_DATA_LIMIT);
+			ComFunc.log("offset:" + offset);
+			ComFunc.memcpy(rcv, ret, offset, PACKAGE_RECV_DATA_START, PACKAGE_RECV_LENGTH_DATA_LIMIT);
 
 		}
 
 		// Common.log("rcv:", Common.memcut(rcv, 0, 142), Common.memcut(rcv, 0,
 		// 142).length);
-		return Common.memcut(rcv, 0, 142);
+		return ComFunc.memcut(rcv, 0, 142);
 		// return rcv;
 
 	}
@@ -417,7 +422,7 @@ public class Function extends Enums {
 		byte bs[] = getCalCommandHead();
 		byte[] ret = mUsb.sendCommand(bs, bs.length);
 		if (ret == null) {
-			Common.log("readCalPoint error send command ");
+			ComFunc.log("readCalPoint error send command ");
 			return null;
 		}
 
@@ -427,9 +432,9 @@ public class Function extends Enums {
 		if (point_num == 0)
 			return null;
 		
-		Common.sleep(20);
+		ComFunc.sleep(20);
 
-		return Common.memcut(ret, 3, 3+4);
+		return ComFunc.memcut(ret, 3, 3+4);
 	}
 	
 	public PointF readCalPoint() {
@@ -451,17 +456,17 @@ public class Function extends Enums {
 		// int roundUpLen = Common.roundUp(len, PACKAGE_RECV_LENGTH_DATA_LIMIT);
 		// byte[] rcv = new byte[roundUpLen];
 		byte[] rcv = new byte[len];
-		Common.memset(rcv, 0x00, rcv.length);
+		ComFunc.memset(rcv, 0x00, rcv.length);
 
 		command = getImageCommandHead(mode, len);
 		byte[] ret = mUsb.sendCommand(command, command.length);
 		if (ret == null)
 			return null;
 
-		Common.sleep(40);
+		ComFunc.sleep(40);
 		ret = recvResult(len);
 		if (ret == null) {
-			Common.log("recv command_id fail");
+			ComFunc.log("recv command_id fail");
 			return null;
 		}
 
@@ -470,10 +475,10 @@ public class Function extends Enums {
 
 		// Common.log("rcv img:", Common.memcut(rcv, 0, len), len);
 		// return Common.memcut(rcv, 0, len);
-		return Common.memcut(ret, 7, len - 7);
+		return ComFunc.memcut(ret, 7, len - 7);
 	}
 
-	int mProgress = Enums.PROGRESS_UNSTART;
+	int mProgress = Constant.PROGRESS_UNSTART;
 
 	public void setProgress(int v) {
 		mProgress = v;
@@ -497,23 +502,23 @@ public class Function extends Enums {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			r = false;
-			mProgress = Enums.PROGRESS_ERR;
+			mProgress = Constant.PROGRESS_ERR;
 		}
 		// 15
 		if (r)
-			mProgress = Enums.PROGRESS_FINISH;
+			mProgress = Constant.PROGRESS_FINISH;
 		else
-			mProgress = Enums.PROGRESS_ERR;
+			mProgress = Constant.PROGRESS_ERR;
 
-		Common.log("write upgrade result:" + mProgress);
+		ComFunc.log("write upgrade result:" + mProgress);
 		return r;
 	}
 
 	public boolean prepareUpgrade() {
-		mProgress = Enums.PROGRESS_UNSTART;
+		mProgress = Constant.PROGRESS_UNSTART;
 		byte[] ret = switchMode(SET_MODE);
 		if (ret == null) {
-			Common.log("prepareUpgrade error swich set mode");
+			ComFunc.log("prepareUpgrade error swich set mode");
 			return false;
 		}
 		mProgress = 1;
@@ -521,18 +526,18 @@ public class Function extends Enums {
 		byte[] command = getEraseHead(addr, 1);
 		ret = mUsb.sendCommand(command, command.length);
 		if (ret == null) {
-			Common.log("prepareUpgrade error swich set mode");
+			ComFunc.log("prepareUpgrade error swich set mode");
 			return false;
 		}
 		ret = recvResult();
 		if (ret == null) {
-			Common.log("prepareUpgrade error swich set mode");
+			ComFunc.log("prepareUpgrade error swich set mode");
 			return false;
 		}
 		mProgress = 2;
 		ret = switchMode(BOOTLOADER_MODE);
 		if (ret == null) {
-			Common.log("prepareUpgrade error swich set mode");
+			ComFunc.log("prepareUpgrade error swich set mode");
 			return false;
 		}
 		mProgress = 10;
@@ -544,11 +549,11 @@ public class Function extends Enums {
 		
 		byte[] ret = null;
 		int addr_org = addr;
-		int roundDownLen = Common.roundDown(data_len, PACKAGE_SEND_LENGTH_LIMIT);
+		int roundDownLen = ComFunc.roundDown(data_len, PACKAGE_SEND_LENGTH_LIMIT);
 		for (int j = 0; j < roundDownLen; j += PACKAGE_SEND_LENGTH_LIMIT) {
 
 			addr = addr_org + j;
-			byte[] data = Common.memcut(data_send, j, PACKAGE_SEND_LENGTH_LIMIT);
+			byte[] data = ComFunc.memcut(data_send, j, PACKAGE_SEND_LENGTH_LIMIT);
 			byte [] command = getWriteCommandHead(addr, PACKAGE_SEND_LENGTH_LIMIT, data);
 			ret = mUsb.sendCommand(command, command.length);
 			if (ret == null)
@@ -562,7 +567,7 @@ public class Function extends Enums {
 		int remain = data_len - roundDownLen;
 		if (remain > 0) {
 			addr = addr_org + roundDownLen;
-			byte[] data = Common.memcut(data_send, roundDownLen, remain);
+			byte[] data = ComFunc.memcut(data_send, roundDownLen, remain);
 			byte [] command = getWriteCommandHead(addr, remain, data);
 			ret = mUsb.sendCommand(command, command.length);
 			if (ret == null)
@@ -578,8 +583,8 @@ public class Function extends Enums {
 	public boolean upgrade(File f) throws IOException {
 
 		/* read bin data */
-		byte[] buffer = new byte[Enums.KB];
-		byte[] file_data = new byte[Enums.MB];
+		byte[] buffer = new byte[Constant.KB];
+		byte[] file_data = new byte[Constant.MB];
 		int r = 0;
 		int offset = 0;
 		byte[] version = new byte[4];
@@ -591,31 +596,31 @@ public class Function extends Enums {
 			r = in.read(buffer);
 			if (r < 0)
 				break;
-			Common.memcpy(file_data, buffer, offset, 0, r);
+			ComFunc.memcpy(file_data, buffer, offset, 0, r);
 			offset += r;
 		} while (r > 0);
 		in.close();
 		// file_len = offset;
 		// file_len -= 8;
-		Common.memcpy(version, file_data, 0, 4, 4);
+		ComFunc.memcpy(version, file_data, 0, 4, 4);
 
-		Common.log("version:" + version);
+		ComFunc.log("version:" + version);
 
 		/* switch emcry mode */
 		mProgress = 15;
 		byte[] ret;
 		int cnt = 0;
 		do {
-			Common.sleep(40);
-			ret = switchMode(Enums.EMCRYPTION_OPEN);
+			ComFunc.sleep(40);
+			ret = switchMode(Constant.EMCRYPTION_OPEN);
 			if (ret == null) {
-				Common.log("switchMode(Enums.EMCRYPTION_OPEN) err 0 try:" + cnt);
+				ComFunc.log("switchMode(Enums.EMCRYPTION_OPEN) err 0 try:" + cnt);
 				continue;
 				// return false;
 			}
 			ret = recvResult();
 			if (ret == null) {
-				Common.log("switchMode(Enums.EMCRYPTION_OPEN) err 1 try:" + cnt);
+				ComFunc.log("switchMode(Enums.EMCRYPTION_OPEN) err 1 try:" + cnt);
 				continue;
 				// return false;
 			}
@@ -623,18 +628,18 @@ public class Function extends Enums {
 		mProgress = 16;
 		/* erase */
 
-		int packetCount = (file_len + (Enums.KB - 1)) / Enums.KB;
+		int packetCount = (file_len + (Constant.KB - 1)) / Constant.KB;
 		int addr_start = FW_UPDATEFLAG_ADDR | EXTERNAL_FLASH_ADDRESS;
 		byte[] command = getEraseHead(addr_start, packetCount);
 		ret = mUsb.sendCommand(command, command.length);
 		if (ret == null) {
-			Common.log("erase FW_UPDATEFLAG_ADDR err 0");
+			ComFunc.log("erase FW_UPDATEFLAG_ADDR err 0");
 			return false;
 		}
-		Common.sleep(20);
+		ComFunc.sleep(20);
 		ret = recvResult();
 		if (ret == null) {
-			Common.log("erase FW_UPDATEFLAG_ADDR err 1");
+			ComFunc.log("erase FW_UPDATEFLAG_ADDR err 1");
 			return false;
 		}
 
@@ -655,30 +660,30 @@ public class Function extends Enums {
 				
 				
 				offset = i * OUT_LEN + 8;
-				byte[] data_send = Common.memcut(file_data, offset, dataLen);
+				byte[] data_send = ComFunc.memcut(file_data, offset, dataLen);
 				ret = sendBlockData(addr, data_send, data_send.length);
 				if (ret == null)
 					return false;
 
 			}
 		} else {
-			mProgress += Enums.PROGRESS_FINISH / 2;
+			mProgress += Constant.PROGRESS_FINISH / 2;
 			offset = 8;
-			byte[] data_send = Common.memcut(file_data, offset, file_len);
+			byte[] data_send = ComFunc.memcut(file_data, offset, file_len);
 			sendBlockData(addr_start, data_send, data_send.length);
 		}
 
 		/* switch offemcry mode */
 		mProgress++;// 13
-		ret = switchMode(Enums.EMCRYPTION_CLOSE);
+		ret = switchMode(Constant.EMCRYPTION_CLOSE);
 		if (ret == null) {
-			Common.log("switchMode(Enums.EMCRYPTION_CLOSE) 0");
+			ComFunc.log("switchMode(Enums.EMCRYPTION_CLOSE) 0");
 			return false;
 		}
 		ret = recvResult();
 
 		if (ret == null) {
-			Common.log("switchMode(Enums.EMCRYPTION_CLOSE) 1");
+			ComFunc.log("switchMode(Enums.EMCRYPTION_CLOSE) 1");
 			return false;
 		}
 		mProgress = 76;
@@ -693,12 +698,12 @@ public class Function extends Enums {
 		byte[] command = getEraseHead(addr, 1);
 		byte[] ret = mUsb.sendCommand(command, command.length);
 		if (ret == null) {
-			Common.log("erase FW_VERSION_ADDR err 0");
+			ComFunc.log("erase FW_VERSION_ADDR err 0");
 			return false;
 		}
 		ret = recvResult();
 		if (ret == null) {
-			Common.log("erase FW_VERSION_ADDR err 1");
+			ComFunc.log("erase FW_VERSION_ADDR err 1");
 			return false;
 		}
 		mProgress = 78;
@@ -706,12 +711,12 @@ public class Function extends Enums {
 		command = getWriteCommandHead(addr, 4, version);
 		ret = mUsb.sendCommand(command, command.length);
 		if (ret == null) {
-			Common.log("write FW_VERSION_ADDR err 0");
+			ComFunc.log("write FW_VERSION_ADDR err 0");
 			return false;
 		}
 		ret = recvResult();
 		if (ret == null) {
-			Common.log("write FW_VERSION_ADDR err 1");
+			ComFunc.log("write FW_VERSION_ADDR err 1");
 			return false;
 
 		}
@@ -720,12 +725,12 @@ public class Function extends Enums {
 		command = getWriteCommandHead(addr, 4, data);
 		ret = mUsb.sendCommand(command, command.length);
 		if (ret == null) {
-			Common.log("write FW_VERSION_ADDR err 2");
+			ComFunc.log("write FW_VERSION_ADDR err 2");
 			return false;
 		}
 		ret = recvResult();
 		if (ret == null) {
-			Common.log("write FW_VERSION_ADDR err 3");
+			ComFunc.log("write FW_VERSION_ADDR err 3");
 			return false;
 		}
 		
@@ -734,5 +739,31 @@ public class Function extends Enums {
 		return true;
 	}
 	
+	private byte[] __writeCalKey(byte []data) {
+		int addr =  SHORTCUT_INFO_ADDR | EXTERNAL_FLASH_ADDRESS;
+		byte [] ret = sendBlockData(addr, data, data.length);
+		return ret;
+	}
+	
+	public boolean writeCalKey(byte [] data) {
+		byte [] ret = switchMode(SET_MODE);
+		if (ret == null)
+			return false;
+		
+		int addr = SHORTCUT_INFO_ADDR | EXTERNAL_FLASH_ADDRESS;
+		byte [] command = getEraseHead(addr, 1);
+		ret = mUsb.sendCommand(command, command.length);
+		if (ret == null)
+			return false;
+		ret = recvResult();
+		if (ret == null)
+			return false;
+		
+		ComFunc.sleep(20);
+		ret = __writeCalKey(data);
+		if (ret == null)
+			return false;
+		return true;
+	}
 
 }

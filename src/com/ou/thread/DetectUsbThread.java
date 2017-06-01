@@ -1,14 +1,20 @@
-package com.ou.usbtp;
+package com.ou.thread;
 
-import com.ou.common.Common;
-import com.ou.common.Enums;
+import com.ou.base.CallBack;
+import com.ou.base.Device;
+import com.ou.base.Function;
+import com.ou.base.ShortCutPointGroup;
+import com.ou.common.ComFunc;
+import com.ou.common.Constant;
 import com.ou.ui.UIMessageHandler;
+import com.ou.usbtp.R;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
+import android.util.SparseArray;
 
 public class DetectUsbThread extends Thread {
 	private UIMessageHandler mHandler;
@@ -21,16 +27,34 @@ public class DetectUsbThread extends Thread {
 	private Object mLock;
 	private boolean bNeedRequestPermission = true;
 	private int requestCount = 0;
-	private CallBack mCall;
+
 	private boolean bFirst = true;
-	public DetectUsbThread(Context context, CallBack call) {
+	SparseArray <CallBack> mCallMap ;
+	int mCallId = 0;
+	public void addCall( CallBack call) {
+		mCallId++;
+		mCallMap.put(mCallId, call);
+	}
+	
+	public void deleteCall(CallBack call) {
+		for (int i = 0; i < mCallMap.size(); i++) {
+			CallBack c = mCallMap.valueAt(i);
+			if (c == call) {
+				int key = mCallMap.keyAt(i);
+				mCallMap.delete(key);
+				break;
+			}
+		}
+		
+	}
+	public DetectUsbThread(Context context) {
 		mHandler = new UIMessageHandler();
 		mContext = context;
 		mLock = new Object();
-		mCall = call;
+		mCallMap = new SparseArray<CallBack>();
 		IntentFilter filter = new IntentFilter();
-		filter.addAction(Enums.ACTION_USB_PERMISSION);
-		filter.addAction(Enums.FIRST_BLOOD);
+		filter.addAction(Constant.ACTION_USB_PERMISSION);
+		filter.addAction(Constant.FIRST_BLOOD);
 		filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
 		filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
 		context.registerReceiver(mUsbReceiver, filter);
@@ -41,7 +65,7 @@ public class DetectUsbThread extends Thread {
 		bWork = false;
 		int cnt = 0;
 		while (bExit == false && cnt++ < 60) {
-			Common.sleep(100);
+			ComFunc.sleep(100);
 		}
 		if (bOpen)
 			deviceDeinit(true);
@@ -52,7 +76,7 @@ public class DetectUsbThread extends Thread {
 		bExit = false;
 		while (bWork) {
 			work();
-			Common.sleep(200);
+			ComFunc.sleep(200);
 			
 		}
 
@@ -98,7 +122,7 @@ public class DetectUsbThread extends Thread {
 
 		boolean has_permission = mUsb.checkUsbPermission();
 		if (has_permission) {	
-			Common.log("has permission");
+			ComFunc.log("has permission");
 			boolean boot_mode = mUsb.isBootDevice();
 			bOpen = mUsb.open();
 			if (boot_mode) {
@@ -107,11 +131,11 @@ public class DetectUsbThread extends Thread {
 					//sendMessage(Enums.MSG_OPEN_DEVICE_BOOT_MODE_SUCC);
 					if (bFirst) {
 						bFirst = false;
-						mContext.sendBroadcast(new Intent(Enums.FIRST_BLOOD));
+						mContext.sendBroadcast(new Intent(Constant.FIRST_BLOOD));
 					}
 				}
 				else {
-					sendMessage(Enums.MSG_OPEN_DEVICE_BOOT_MODE_ERR);
+					sendMessage(Constant.MSG_OPEN_DEVICE_BOOT_MODE_ERR);
 				}
 			} else {
 				if (bOpen) {
@@ -119,18 +143,18 @@ public class DetectUsbThread extends Thread {
 					mFunc = new Function(mUsb);
 					if (bFirst) {
 						bFirst = false;
-						mContext.sendBroadcast(new Intent(Enums.FIRST_BLOOD));
+						mContext.sendBroadcast(new Intent(Constant.FIRST_BLOOD));
 					}
 				}
 				else
-					sendMessage(Enums.MSG_OPEN_DEVICE_NORMAL_MODE_ERR);
+					sendMessage(Constant.MSG_OPEN_DEVICE_NORMAL_MODE_ERR);
 			}
 			//sendMessage(Enums.MSG_REQUEST_USB_PERMISSION_SUCC);
 		} else {
-			Common.log("enter request");
+			ComFunc.log("enter request");
 			if (bNeedRequestPermission) {
-				Common.log("request permission now ");
-				sendMessage(Enums.MSG_NEED_USB_PERMISSION);
+				ComFunc.log("request permission now ");
+				sendMessage(Constant.MSG_NEED_USB_PERMISSION);
 				mUsb.requestPermission();
 			}
 			
@@ -138,7 +162,7 @@ public class DetectUsbThread extends Thread {
 			if (requestCount++ > 10) {
 				requestCount = 0;
 				bNeedRequestPermission = true;
-				Common.log("maybe android is stupid for new device or dead");
+				ComFunc.log("maybe android is stupid for new device or dead");
 				
 			}
 		}
@@ -160,18 +184,24 @@ public class DetectUsbThread extends Thread {
 		bOpen = false;
 	}
 
+	void call() {
+		for (int i = 0; i < mCallMap.size(); i++) {
+			CallBack c = mCallMap.valueAt(i);
+			c.call();
+		}
+	}
 	private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
 
 		public void onReceive(Context context, Intent intent) {
 			String action = intent.getAction();
-			if (Enums.ACTION_USB_PERMISSION.equals(action)) {
+			if (Constant.ACTION_USB_PERMISSION.equals(action)) {
 				synchronized (this) {
 					// UsbDevice device = (UsbDevice)
 					// intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
 					boolean r = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false);
-					Common.log("request 2:" + r);
+					ComFunc.log("request 2:" + r);
 					
-					Common.log("set permission:" + bNeedRequestPermission);
+					ComFunc.log("set permission:" + bNeedRequestPermission);
 					if (r) {
 						deviceDeinit(false);
 					} else {
@@ -184,23 +214,17 @@ public class DetectUsbThread extends Thread {
 				deviceDeinit(false);
 				/*request first time*/
 
-				Common.log(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-				Common.log("set permission 1:" + bNeedRequestPermission);
-				if (mCall != null) {
-					Common.sleep(500);
-					mCall.call();
-				}
+				ComFunc.log(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+				ComFunc.log("set permission 1:" + bNeedRequestPermission);
+				call();
 			} else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
 				bNeedRequestPermission = true;
 				deviceDeinit(false);
-				Common.log(UsbManager.ACTION_USB_DEVICE_DETACHED);
-				if (mCall != null)
-					mCall.call();
+				ComFunc.log(UsbManager.ACTION_USB_DEVICE_DETACHED);
+				call();
 			
-			} else if (Enums.FIRST_BLOOD.equals(action)){
-				if (mCall != null) {
-					mCall.call();
-				}
+			} else if (Constant.FIRST_BLOOD.equals(action)){
+				call();
 			}
 		}
 	};

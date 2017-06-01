@@ -1,11 +1,11 @@
 package com.ou.ui;
 
-import com.ou.common.Common;
-import com.ou.common.Enums;
-import com.ou.usbtp.DetectUsbThread;
-import com.ou.usbtp.Function;
+import com.ou.base.Function;
+import com.ou.base.UpgradeThread;
+import com.ou.common.ComFunc;
+import com.ou.common.Constant;
+import com.ou.thread.DetectUsbThread;
 import com.ou.usbtp.R;
-import com.ou.usbtp.UpgradeThread;
 import com.ou.view.ProgressView;
 
 import android.app.Dialog;
@@ -53,90 +53,90 @@ public class ProgressDialog extends Dialog {
 				// TODO Auto-generated method stub
 				while (true) {
 					mPercent = mWorkThread.getPercent();
-					Common.log("percent:" + mPercent);
-					if (mPercent == Enums.PROGRESS_UNSTART) {
+					ComFunc.log("percent:" + mPercent);
+					if (mPercent == Constant.PROGRESS_UNSTART) {
 
 						obse_time++;
 						if (obse_time > 8) {
-							mCurPercent = Enums.PROGRESS_ERR;
-							mPercent = Enums.PROGRESS_ERR;
+							mCurPercent = Constant.PROGRESS_ERR;
+							mPercent = Constant.PROGRESS_ERR;
 
 						} else {
-							Common.sleep(100);
+							ComFunc.sleep(100);
 							continue;
 						}
 					}
-					else if (mPercent <= Enums.PROGRESS_ERR) {
+					else if (mPercent <= Constant.PROGRESS_ERR) {
 						mCurPercent-= 2;
 					}
 					
-					else if (mPercent <= Enums.PROGRESS_FLASH_FINISH
-							&& mCurPercent <= Enums.PROGRESS_FLASH_FINISH) {
+					else if (mPercent <= Constant.PROGRESS_FLASH_FINISH
+							&& mCurPercent <= Constant.PROGRESS_FLASH_FINISH) {
 						mCurPercent++;
-					}  else if (mCurPercent <= (Enums.PROGRESS_FINISH - 2)) {
+					}  else if (mCurPercent <= (Constant.PROGRESS_FINISH - 2)) {
 						mCurPercent++;
 					}  
 
-					if (mPercent == Enums.PROGRESS_READ_FILE)
-						mNote = Common.getString(getContext(), R.string.upgrade_check_file);
-					else if (mPercent >= Enums.PROGRESS_WRITE_DATA && mPercent < Enums.PROGRESS_FLASH_FINISH)
-						mNote = Common.getString(getContext(), R.string.upgrade_write_data);
-					else if (mPercent == Enums.PROGRESS_FLASH_FINISH)
-						mNote = Common.getString(getContext(), R.string.upgrade_write_finish);
-					else if (mPercent > Enums.PROGRESS_FLASH_FINISH)
-						mNote = Common.getString(getContext(), R.string.upgrade_switch_nomal);
-					else if (mPercent == Enums.PROGRESS_SWITCH_BOOT)
-						mNote = Common.getString(getContext(), R.string.upgrade_switch_boot);
+					if (mPercent == Constant.PROGRESS_READ_FILE)
+						mNote = ComFunc.getString(getContext(), R.string.upgrade_check_file);
+					else if (mPercent >= Constant.PROGRESS_WRITE_DATA && mPercent < Constant.PROGRESS_FLASH_FINISH)
+						mNote = ComFunc.getString(getContext(), R.string.upgrade_write_data);
+					else if (mPercent == Constant.PROGRESS_FLASH_FINISH)
+						mNote = ComFunc.getString(getContext(), R.string.upgrade_write_finish);
+					else if (mPercent > Constant.PROGRESS_FLASH_FINISH)
+						mNote = ComFunc.getString(getContext(), R.string.upgrade_switch_nomal);
+					else if (mPercent == Constant.PROGRESS_SWITCH_BOOT)
+						mNote = ComFunc.getString(getContext(), R.string.upgrade_switch_boot);
 
 					float t = Math.abs(mPercent - mCurPercent) / 100;
 					mSleep = (long) (Math.abs(1 - 4 * t) * 400);
 					mHandler.obtainMessage(PROGRESS_UPDATE).sendToTarget();
-					Common.sleep(mSleep);
+					ComFunc.sleep(mSleep);
 					sleep_all += mSleep;
 
 					if (sleep_all > 100 * 1000) {
 						// some truoble ocur
-						mCurPercent = Enums.PROGRESS_ERR;
-						mPercent = Enums.PROGRESS_ERR;
-						mNote = Common.getString(getContext(), R.string.upgrade_timeout);
+						mCurPercent = Constant.PROGRESS_ERR;
+						mPercent = Constant.PROGRESS_ERR;
+						mNote = ComFunc.getString(getContext(), R.string.upgrade_timeout);
 						mHandler.obtainMessage(PROGRESS_UPDATE).sendToTarget();
 						mHandler.obtainMessage(PROGRESS_FINISH).sendToTarget();
 					}
 
-					if (mCurPercent >= (Enums.PROGRESS_FINISH - 1)) {
+					if (mCurPercent >= (Constant.PROGRESS_FINISH - 1)) {
 						boolean r = false;
 						int cnt = 0;
 						do {
 							r = DetectUsbThread.isUsbEnable();
-							Common.sleep(20);
+							ComFunc.sleep(20);
 						} while (r == false && cnt++ < 1000);
 						
 						if (cnt >= 1000) {
-							mCurPercent = Enums.PROGRESS_ERR;
-							mPercent = Enums.PROGRESS_ERR;
-							mNote = Common.getString(getContext(), R.string.upgrade_timeout);
+							mCurPercent = Constant.PROGRESS_ERR;
+							mPercent = Constant.PROGRESS_ERR;
+							mNote = ComFunc.getString(getContext(), R.string.upgrade_timeout);
 							mHandler.obtainMessage(PROGRESS_UPDATE).sendToTarget();
 							mHandler.obtainMessage(PROGRESS_FINISH).sendToTarget();
 							break;
 						}
 							
-						mCurPercent = Enums.PROGRESS_FINISH;
-						mNote = Common.getString(getContext(), R.string.upgrade_finish);
+						mCurPercent = Constant.PROGRESS_FINISH;
+						mNote = ComFunc.getString(getContext(), R.string.upgrade_finish);
 						mHandler.obtainMessage(PROGRESS_UPDATE).sendToTarget();
 						mHandler.obtainMessage(PROGRESS_FINISH).sendToTarget();
 						break;
 					} 
 					
-					if (mCurPercent <= Enums.PROGRESS_ERR) {
-						mCurPercent = Enums.PROGRESS_ERR;
-						mNote = Common.getString(getContext(), R.string.upgrade_err);
+					if (mCurPercent <= Constant.PROGRESS_ERR) {
+						mCurPercent = Constant.PROGRESS_ERR;
+						mNote = ComFunc.getString(getContext(), R.string.upgrade_err);
 						mHandler.obtainMessage(PROGRESS_UPDATE).sendToTarget();
 						mHandler.obtainMessage(PROGRESS_FINISH).sendToTarget();
 						break;
 					} else
 						;
 				}
-				Common.log("sleep all:" + sleep_all);
+				ComFunc.log("sleep all:" + sleep_all);
 			}
 		}).start();
 	}

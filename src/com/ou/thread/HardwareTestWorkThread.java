@@ -1,7 +1,10 @@
-package com.ou.usbtp;
+package com.ou.thread;
 
-import com.ou.common.Common;
-import com.ou.common.Enums;
+import com.ou.base.BoardConfig;
+import com.ou.base.Function;
+import com.ou.base.HardwareSignal;
+import com.ou.common.ComFunc;
+import com.ou.common.Constant;
 
 import android.os.Handler;
 
@@ -26,7 +29,7 @@ public class HardwareTestWorkThread extends Thread {
 
 	private HardwareSignal fillAllSignal() {
 		HardwareSignal signal = new HardwareSignal(mBoardConfig);
-		for (int dir = 0; dir < Enums.LED_EMIT_DIRECTION_TOTAL_NUM; dir++) {
+		for (int dir = 0; dir < Constant.LED_EMIT_DIRECTION_TOTAL_NUM; dir++) {
 			byte [] bs = mFunc.readImage(dir, mBoardConfig.getTotalLedNumber());
 
 			signal.setXLedSignal(dir, bs,true);
@@ -36,14 +39,14 @@ public class HardwareTestWorkThread extends Thread {
 	}
 
 	private void sendImage(HardwareSignal sig) {
-		mHandler.obtainMessage(Enums.MSG_UPDATE_IMAGE, sig).sendToTarget();
+		mHandler.obtainMessage(Constant.MSG_UPDATE_IMAGE, sig).sendToTarget();
 	}
 	@Override
 	public void run() {
 		while (bWork) {
 			HardwareSignal sig= fillAllSignal();
 			sendImage(sig);
-			Common.sleep(1);
+			ComFunc.sleep(1);
 		}
 	}
 

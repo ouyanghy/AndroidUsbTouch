@@ -1,25 +1,27 @@
-package com.ou.usbtp;
+package com.ou.base;
 
-import com.ou.common.Common;
+import com.ou.common.ComFunc;
+import com.ou.common.Constant;
 
 import android.graphics.PointF;
+import android.graphics.Rect;
 
 public class CalMath {
 	public CalMath() {
 		
 	}
 
-	public byte [] getResult(int width, int height, PointF []calP, PointF [] screenP) {
+	public byte [] getCalResult(int width, int height, PointF []calP, PointF [] screenP) {
 		PointF[] calps = transferCalPoint(calP);
 		PointF[] screenps = transferScreenPoint(screenP, width, height);
 		int [] rcv = new int[8];
 		boolean r = CalEquation(calps, screenps, rcv);
 		if (r == false) {
-			Common.log("CalEquation error");
+			ComFunc.log("CalEquation error");
 			return null;
 		}
 		
-		byte [] ret = Common.intsToBytes(rcv);
+		byte [] ret = ComFunc.intsToBytes(rcv);
 		return ret;
 	}
 	public PointF[] transferCalPoint(PointF[] calP) {
@@ -79,12 +81,12 @@ public class CalMath {
 
 		r = MatrixInverse(A, 8);
 		if (r == false) {
-			Common.log("MatrixInverse err");
+			ComFunc.log("MatrixInverse err");
 			return false;
 		}
 		r = MatrixMulti(A, 8, 8, B, 8, 1, C);
 		if (r == false) {
-			Common.log("MatrixMulti err");
+			ComFunc.log("MatrixMulti err");
 			return false;
 		}
 		
@@ -148,7 +150,7 @@ public class CalMath {
 			}
 
 			if (fabs(div) < 1e-10) {
-				Common.log("err div:" + fabs(div));
+				ComFunc.log("err div:" + fabs(div));
 				return false;
 			}
 			if (is[k] != k) {
@@ -201,5 +203,55 @@ public class CalMath {
 
 		return true;
 	}
+	
+	public Rect[] getCalKeyPosition(int zone, ShortCutPointGroup grp) {
+		float offset;
+		float height;
+		int sign_bit = 1;
+		int j = 0;
+		int cnt = grp.getCount();
+		Rect[] rects = new Rect[cnt];
+		for (int i = 0; i < cnt; i++) {
+			rects[i] = new Rect();
+		}
+		
+		int index = 0;
+		rects[index].left = (int) grp.getFirst().x;
+		rects[index].right = (int) grp.getFirst().y;
+
+		rects[index].right = (int) grp.getSecond().x;
+		rects[index].bottom = (int) grp.getSecond().y;
+		index += 1;
+
+		if (cnt < 1)
+			return rects;
+
+		if (zone == Constant.ZONE_LEFT || zone == Constant.ZONE_RIGHT) {
+			height = (grp.getThird().y - grp.getFirst().y);
+			offset = (grp.getThird().x - grp.getSecond().x);
+		} else {
+			height = (grp.getThird().x - grp.getFirst().x);
+			offset = (grp.getThird().y - grp.getSecond().y);
+		}
+		sign_bit = (offset >= 0) ? 1 : (-1);
+		for (j = 0; j < cnt - 1; j++) {
+			if (zone == Constant.ZONE_LEFT || zone == Constant.ZONE_RIGHT) {
+				rects[index].left = (int) (grp.getFirst().x + (offset * j + sign_bit * cnt / 2) / (cnt - 1));
+				rects[index].right = (int) (grp.getFirst().y + (height * j + cnt / 2) / (cnt - 1));
+
+				rects[index].right = (int) (grp.getSecond().x + (offset * j + sign_bit * cnt / 2) / (cnt - 1));
+				rects[index].bottom = (int) (grp.getSecond().y + (height * j + cnt / 2) / (cnt - 1));
+			} else {
+				rects[index].left = (int) (grp.getFirst().x + (height * j + cnt / 2) / (cnt - 1));
+				rects[index].right = (int) (grp.getFirst().y + (offset * j + sign_bit * cnt / 2) / (cnt - 1));
+
+				rects[index].right = (int) (grp.getSecond().x + (height * j + cnt / 2) / (cnt - 1));
+				rects[index].bottom = (int) (grp.getSecond().y + (offset * j + sign_bit * cnt / 2) / (cnt - 1));
+			}
+			index++;
+		}
+		return rects;
+	}
+
 
 }

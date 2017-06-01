@@ -1,10 +1,10 @@
 package com.ou.ui;
 
-import com.ou.common.Common;
-import com.ou.common.Enums;
-import com.ou.usbtp.BoardConfig;
-import com.ou.usbtp.HardwareSignal;
-import com.ou.usbtp.HardwareTestWorkThread;
+import com.ou.base.BoardConfig;
+import com.ou.base.HardwareSignal;
+import com.ou.common.ComFunc;
+import com.ou.common.Constant;
+import com.ou.thread.HardwareTestWorkThread;
 import com.ou.usbtp.R;
 import com.ou.view.HardwareTestView;
 
@@ -35,13 +35,13 @@ public class HardwareTestAcitivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.hardware_test);
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-		int size = getIntent().getIntExtra(Enums.INTENT_SIZE, -1);
-		byte[] buffer = getIntent().getByteArrayExtra(Enums.INTENT_BUFF);
+		int size = getIntent().getIntExtra(Constant.INTENT_SIZE, -1);
+		byte[] buffer = getIntent().getByteArrayExtra(Constant.INTENT_BUFF);
 		mLock = new Object();
 		// Common.log("after 0:" +buffer[0] + " 1:" + buffer[1]);
 
 		mBoardConfig = new BoardConfig(size, buffer);
-		Common.log(mBoardConfig.toString());
+		ComFunc.log(mBoardConfig.toString());
 
 		mV = (HardwareTestView) findViewById(R.id.hardwareView);
 		mV.init(mBoardConfig);
@@ -90,7 +90,7 @@ public class HardwareTestAcitivity extends Activity {
 		// as you specify a parent activity in AndroidManifest.xml.
 		int id = item.getItemId();
 		int gid = item.getGroupId();
-		Common.log("++select:" + id + " gid:" + gid);
+		ComFunc.log("++select:" + id + " gid:" + gid);
 		boolean ready = false;
 		int cnt = 0;
 		switch (gid) {
@@ -102,8 +102,8 @@ public class HardwareTestAcitivity extends Activity {
 		
 			do {		
 				ready = mV.getDrawStatus();
-				Common.sleep(10);
-				Common.log("x select ready:" + ready);
+				ComFunc.sleep(10);
+				ComFunc.log("x select ready:" + ready);
 			}while(ready == false && cnt++ < 100);
 			mV.setXMode(id);
 			synchronized (mLock) {
@@ -116,7 +116,7 @@ public class HardwareTestAcitivity extends Activity {
 			}
 			do {		
 				ready = mV.getDrawStatus();
-				Common.sleep(10);
+				ComFunc.sleep(10);
 			}while(ready == false && cnt++ < 100);
 			mV.setYMode(id);
 			synchronized (mLock) {
@@ -144,7 +144,7 @@ public class HardwareTestAcitivity extends Activity {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 			/* recv image data from HardwareTestWorkThread */
-			case Enums.MSG_UPDATE_IMAGE:
+			case Constant.MSG_UPDATE_IMAGE:
 				HardwareSignal signal = (HardwareSignal) msg.obj;
 				boolean ready = mV.getDrawStatus();
 				//Common.log("handler ready:" + ready + " setting:" + bSetting );

@@ -1,6 +1,6 @@
 package com.ou.view;
 
-import com.ou.common.Common;
+import com.ou.common.ComFunc;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -23,7 +23,7 @@ public class ProgressView extends View {
 		mPaint.setColor(Color.GREEN);
 		mMiddle = new Point();
 	
-		Common.log("(" + getWidth() + "," + getHeight() + ")");
+		ComFunc.log("(" + getWidth() + "," + getHeight() + ")");
 
 	}
 

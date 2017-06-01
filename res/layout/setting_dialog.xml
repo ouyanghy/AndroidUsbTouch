@@ -12,10 +12,10 @@
 
 
     <TextView
-        android:id="@+id/textViewCalTv"
+        android:id="@+id/textViewScreenSize"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="尺寸信息" />
+        android:text="@string/setting_screen_info" />
 
     <View
    
@@ -35,7 +35,7 @@
         android:id="@+id/textView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="屏幕模式" />
+        android:text="@string/setting_screen_mode" />
         <View
         android:layout_width="wrap_content"
         android:layout_height="2dp"
@@ -55,13 +55,13 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="横屏" />
+            />
 
         <RadioButton
             android:id="@+id/radioVer"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="竖屏" />
+            />
 
 
     </RadioGroup>
@@ -87,28 +87,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="清除校验" />
+            android:text="@string/setting_clear_cal" />
 
         <Button
             android:id="@+id/buttonSettingReset"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="重置" />
+            android:text="@string/setting_reset" />
 
         <Button
             android:id="@+id/buttonSettingOk"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="确定" />
+            android:text="@string/ok" />
 
         <Button
             android:id="@+id/buttonSettingCancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="取消" />
+            android:text="@string/cancel" />
 
     </LinearLayout>
 <View

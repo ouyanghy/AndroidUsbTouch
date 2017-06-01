@@ -1,9 +1,9 @@
-package com.ou.usbtp;
+package com.ou.base;
 
-import com.ou.common.Common;
-import com.ou.common.Enums;
+import com.ou.common.ComFunc;
+import com.ou.common.Constant;
 
-public class BoardConfig extends Enums {
+public class BoardConfig extends Constant {
 	int mSize;
 	String mTitle;
 	byte mBuffer[];
@@ -35,7 +35,7 @@ public class BoardConfig extends Enums {
 	public BoardConfig(int size, byte[] buffer) {
 		mSize = size;
 		mBuffer = buffer;
-		mIndex = Enums.IGNORE;
+		mIndex = Constant.IGNORE;
 		
 		parse();
 
@@ -50,12 +50,12 @@ public class BoardConfig extends Enums {
 		mBoardMap = new OneBoard[mBoardNum];
 		for (int board_index = 0; board_index < mBoardNum; board_index++) {
 			mBoardMap[board_index] = new OneBoard();
-			int pos = BOARD_MAP_START_POSITION + board_index * Enums.BOARD_INFO_SIZE;
+			int pos = BOARD_MAP_START_POSITION + board_index * Constant.BOARD_INFO_SIZE;
 			mBoardMap[board_index].mBoardGroups = (byte) (mBuffer[pos++] & 0xff);
 			mBoardMap[board_index].mGroupMembers = (byte) (mBuffer[pos++] & 0xff);
 			mBoardMap[board_index].mBoardMembers = (byte) (mBuffer[pos++] & 0xff);
 			mBoardMap[board_index].mBoardGroups = (byte) (mBuffer[pos] & 0xff);
-			Common.log("board map id:" + board_index + " member:" + mBoardMap[board_index].mBoardMembers);
+			ComFunc.log("board map id:" + board_index + " member:" + mBoardMap[board_index].mBoardMembers);
 				
 		}
 		calcXYBoardNumber();
@@ -82,7 +82,7 @@ public class BoardConfig extends Enums {
 		mSize = BOARD_CONFIG_SIZE[index];
 		mTitle = BOARD_CONFIG_TITLE[index];
 		mIndex = index;
-		mBoardMap = new OneBoard[Enums.BOARD_MAX];
+		mBoardMap = new OneBoard[Constant.BOARD_MAX];
 
 		switch (index) {
 		case 0:
@@ -150,13 +150,13 @@ public class BoardConfig extends Enums {
 	}
 
 	private boolean cmp(BoardConfig a) {
-		boolean bcmp = Common.memcmp(a.mBuffer, mBuffer, mBuffer.length);
+		boolean bcmp = ComFunc.memcmp(a.mBuffer, mBuffer, mBuffer.length);
 		boolean scmp = (a.mSize == mSize);
-		Common.log("buffer cmp:" + bcmp + " size cmp:" + scmp);
+		ComFunc.log("buffer cmp:" + bcmp + " size cmp:" + scmp);
 		/* debug,config is different */
 		if (bcmp == false && scmp == true) {
-			Common.log("a buffer:", a.mBuffer, a.mBuffer.length);
-			Common.log("my buffer:", mBuffer, mBuffer.length);
+			ComFunc.log("a buffer:", a.mBuffer, a.mBuffer.length);
+			ComFunc.log("my buffer:", mBuffer, mBuffer.length);
 		}
 		return bcmp & scmp;
 	}

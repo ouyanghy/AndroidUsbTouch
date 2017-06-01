@@ -1,12 +1,12 @@
 package com.ou.ui;
 
-import com.ou.common.Common;
-import com.ou.common.Enums;
-import com.ou.usbtp.CalInfo;
-import com.ou.usbtp.CalMath;
-import com.ou.usbtp.CalThread;
-import com.ou.usbtp.DetectUsbThread;
-import com.ou.usbtp.Function;
+import com.ou.base.CalInfo;
+import com.ou.base.CalMath;
+import com.ou.base.Function;
+import com.ou.common.ComFunc;
+import com.ou.common.Constant;
+import com.ou.thread.CalPointThread;
+import com.ou.thread.DetectUsbThread;
 import com.ou.usbtp.R;
 
 import android.app.Activity;
@@ -17,12 +17,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Handler.Callback;
 import android.os.Message;
-import android.os.Message;
 import android.view.Display;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -37,7 +36,7 @@ public class CalActivity extends Activity implements OnClickListener {
 	PointF mPointTouch[];
 	PointF mPointScreen[];
 	PointF mPointCal[];
-	CalThread mWorker;
+	CalPointThread mWorker;
 	CalActivity mApp;
 	Object mLock;
 	boolean bTouchUp = true;
@@ -70,9 +69,9 @@ public class CalActivity extends Activity implements OnClickListener {
 		mStep = STEP_LEFT_UP;
 		setAllVisiable(false);
 		mLU.setVisibility(View.VISIBLE);
-		mTv.setText(Common.getString(this, R.string.cal_touch_notice));
+		mTv.setText(ComFunc.getString(this, R.string.cal_touch_notice));
 		
-		mWorker = new CalThread(mHandler);
+		mWorker = new CalPointThread(mHandler);
 		
 		float size = mTv.getTextSize();
 		mTv.setTextSize(size * (float)1.4);
@@ -118,16 +117,16 @@ public class CalActivity extends Activity implements OnClickListener {
 		h = mRD.getHeight();
 		mPointScreen[STEP_RIGHT_DOWN].x = vals[0] + w / 2;
 		mPointScreen[STEP_RIGHT_DOWN].y = vals[1] + h / 2;
-		Common.log("screen point:{");
+		ComFunc.log("screen point:{");
 		for (int i = 0; i < 4; i++) {
-			Common.log("(" + mPointScreen[i].x + "," + mPointScreen[i].y + ")");
+			ComFunc.log("(" + mPointScreen[i].x + "," + mPointScreen[i].y + ")");
 		}
-		Common.log("}");
+		ComFunc.log("}");
 		
 		for (int i = 0; i < 4; i++) {
-			Common.log("(" + mPointCal[i].x + "," + mPointCal[i].y + ")");
+			ComFunc.log("(" + mPointCal[i].x + "," + mPointCal[i].y + ")");
 		}
-		Common.log("}");
+		ComFunc.log("}");
 	}
 
 	@Override
@@ -145,7 +144,7 @@ public class CalActivity extends Activity implements OnClickListener {
 			
 			if (event.getAction() == MotionEvent.ACTION_UP) {
 				bTouchUp = true;
-				Common.log("ouyang touch up");
+				ComFunc.log("ouyang touch up");
 				return super.onTouchEvent(event);
 			}
 
@@ -153,7 +152,7 @@ public class CalActivity extends Activity implements OnClickListener {
 				return super.onTouchEvent(event);
 			
 			if (mWorker.getWorkState() == true) {
-				mTv.setText(Common.getString(mApp, R.string.cal_working));
+				mTv.setText(ComFunc.getString(mApp, R.string.cal_working));
 				return super.onTouchEvent(event);
 				
 			}
@@ -161,10 +160,10 @@ public class CalActivity extends Activity implements OnClickListener {
 			if (bTouchUp == false)
 				return super.onTouchEvent(event);
 			
-			mWorker = new CalThread(mHandler);
+			mWorker = new CalPointThread(mHandler);
 			mWorker.start();
 			bTouchUp = false;
-			Common.log("ouyang touch up start cal thread");
+			ComFunc.log("ouyang touch up start cal thread");
 			return super.onTouchEvent(event);
 		}
 	
@@ -200,7 +199,7 @@ public class CalActivity extends Activity implements OnClickListener {
 		Point p = new Point();
 		display.getSize(p);
 		
-		byte [] bs = math.getResult(p.x, p.y, mPointCal, mPointScreen);
+		byte [] bs = math.getCalResult(p.x, p.y, mPointCal, mPointScreen);
 		return bs;
 	}
 	
@@ -229,18 +228,18 @@ public class CalActivity extends Activity implements OnClickListener {
 		@Override
 		public boolean handleMessage(Message msg) {
 			switch (msg.what) {
-			case Enums.MSG_GET_CAL_POINT:
-				Common.log("ouyang touch up MSG_GET_CAL_POINT");
+			case Constant.MSG_GET_CAL_POINT:
+				ComFunc.log("ouyang touch up MSG_GET_CAL_POINT");
 				PointF p = (PointF) msg.obj;
 				
 				if (mStep > 3) {
 					mStep = 3;
-					Common.log("step is out of boundary");
+					ComFunc.log("step is out of boundary");
 				}
 				mPointCal[mStep] = p;
 				//mTv.setText("cal point(" + p.x + "," + p.y + "");
 				setAllVisiable(false);
-				mTv.setText(Common.getString(mApp, R.string.cal_touch_notice));
+				mTv.setText(ComFunc.getString(mApp, R.string.cal_touch_notice));
 				switch (mStep) {
 				case STEP_LEFT_UP:
 					mRU.setVisibility(View.VISIBLE);
@@ -264,22 +263,22 @@ public class CalActivity extends Activity implements OnClickListener {
 					byte []bs = calcuteResult();
 					if (bs == null) {
 						mTv.setOnClickListener(mApp);
-						mTv.setText(Common.getString(mApp, R.string.cal_err));
+						mTv.setText(ComFunc.getString(mApp, R.string.cal_err));
 						break;
 					}
 					boolean r = updateCalInfo(bs);
 					if (r == false) {
-						mTv.setText(Common.getString(mApp, R.string.cal_err));
+						mTv.setText(ComFunc.getString(mApp, R.string.cal_err));
 					}else
-						mTv.setText(Common.getString(mApp, R.string.cal_touch_exit));
+						mTv.setText(ComFunc.getString(mApp, R.string.cal_touch_exit));
 					mTv.setOnClickListener(mApp);
 					break;
 				}
 				mStep++;
 				break;
 
-			case Enums.MSG_GET_CAL_POINT_TIME_OUT:
-				mTv.setText(Common.getString(mApp, R.string.cal_timeout));
+			case Constant.MSG_GET_CAL_POINT_TIME_OUT:
+				mTv.setText(ComFunc.getString(mApp, R.string.cal_timeout));
 				break;
 			default:
 				break;

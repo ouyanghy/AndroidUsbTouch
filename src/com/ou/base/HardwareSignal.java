@@ -1,7 +1,7 @@
-package com.ou.usbtp;
+package com.ou.base;
 
-import com.ou.common.Common;
-import com.ou.common.Enums;
+import com.ou.common.ComFunc;
+import com.ou.common.Constant;
 
 public class HardwareSignal {
 	byte[][] mXledSignal;
@@ -35,8 +35,8 @@ public class HardwareSignal {
 	}
 
 	public HardwareSignal(BoardConfig config) {
-		mXledSignal = new byte[Enums.LED_EMIT_DIRECTION_TOTAL_NUM][config.getXLedNumber()];
-		mYledSignal = new byte[Enums.LED_EMIT_DIRECTION_TOTAL_NUM][config.getYLedNumber()];
+		mXledSignal = new byte[Constant.LED_EMIT_DIRECTION_TOTAL_NUM][config.getXLedNumber()];
+		mYledSignal = new byte[Constant.LED_EMIT_DIRECTION_TOTAL_NUM][config.getYLedNumber()];
 		mConfig = config;
 		// mLedGroup = new byte[Enums.LED_EMIT_DIRECTION_TOTAL_NUM * 2][];
 		initLedGroup();
@@ -56,11 +56,11 @@ public class HardwareSignal {
 
 
 	public HardwareSignal(BoardConfig config, byte[][] totalSignal) {
-		mXledSignal = new byte[Enums.LED_EMIT_DIRECTION_TOTAL_NUM][config.getXLedNumber()];
-		mYledSignal = new byte[Enums.LED_EMIT_DIRECTION_TOTAL_NUM][config.getYLedNumber()];
-		for (int dir = 0; dir < Enums.LED_EMIT_DIRECTION_TOTAL_NUM; dir++) {
-			Common.memcpy(mXledSignal[dir], totalSignal[dir], 0, config.getYLedNumber(), config.getXLedNumber());
-			Common.memcpy(mYledSignal[dir], totalSignal[dir], 0, 0, config.getYLedNumber());
+		mXledSignal = new byte[Constant.LED_EMIT_DIRECTION_TOTAL_NUM][config.getXLedNumber()];
+		mYledSignal = new byte[Constant.LED_EMIT_DIRECTION_TOTAL_NUM][config.getYLedNumber()];
+		for (int dir = 0; dir < Constant.LED_EMIT_DIRECTION_TOTAL_NUM; dir++) {
+			ComFunc.memcpy(mXledSignal[dir], totalSignal[dir], 0, config.getYLedNumber(), config.getXLedNumber());
+			ComFunc.memcpy(mYledSignal[dir], totalSignal[dir], 0, 0, config.getYLedNumber());
 		}
 		mConfig = config;
 
@@ -70,14 +70,14 @@ public class HardwareSignal {
 
 	public void setXLedSignal(int dir, byte[] sig, boolean need_parse) {
 		if (need_parse)
-			Common.memcpy(mXledSignal[dir], sig, 0, mConfig.getYLedNumber(), mConfig.getXLedNumber());
+			ComFunc.memcpy(mXledSignal[dir], sig, 0, mConfig.getYLedNumber(), mConfig.getXLedNumber());
 		else
 			mXledSignal[dir] = sig;
 	}
 
 	public void setYLedSignal(int dir, byte[] sig, boolean need_parse) {
 		if (need_parse)
-			Common.memcpy(mYledSignal[dir], sig, 0, 0, mConfig.getYLedNumber());
+			ComFunc.memcpy(mYledSignal[dir], sig, 0, 0, mConfig.getYLedNumber());
 		else
 			mYledSignal[dir] = sig;
 	}
@@ -140,7 +140,7 @@ I/MLog    ( 8244): start:128 len:64
 		
 		}
 		//Common.log("start:" + start + " len:" +  mConfig.getOneBoardLedNumber(board_index));
-		return Common.memcut(data,  start, mConfig.getOneBoardLedNumber(board_index) );
+		return ComFunc.memcut(data,  start, mConfig.getOneBoardLedNumber(board_index) );
 		
 	}
 	

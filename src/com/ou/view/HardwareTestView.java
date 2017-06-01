@@ -1,8 +1,8 @@
 package com.ou.view;
 
-import com.ou.common.Common;
-import com.ou.usbtp.BoardConfig;
-import com.ou.usbtp.HardwareSignal;
+import com.ou.base.BoardConfig;
+import com.ou.base.HardwareSignal;
+import com.ou.common.ComFunc;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -54,7 +54,7 @@ public class HardwareTestView extends View {
 		mScreenHeight = p.y;
 
 		mSize = config.getSize();
-		Common.log("screen width:" + mScreenWidth + " height:" + mScreenHeight);
+		ComFunc.log("screen width:" + mScreenWidth + " height:" + mScreenHeight);
 
 		mScreenWidth -= FONT_SIZE * 2;
 		// mScreenWidth;
@@ -65,7 +65,7 @@ public class HardwareTestView extends View {
 		// HDIV = mScreenHeight / mYLedNumber;
 		HEIGHT_BLOCK_UNIT = mScreenHeight / SCAL_ROW;
 		HEIGHT_START_BASE = HEIGHT_BLOCK_UNIT;
-		Common.log("X_LED_WDIV:" + X_LED_WDIV);
+		ComFunc.log("X_LED_WDIV:" + X_LED_WDIV);
 		// HEIGHT_UNIT
 
 		mPaint = new Paint();

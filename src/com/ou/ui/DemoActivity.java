@@ -1,10 +1,10 @@
 package com.ou.ui;
 
-import com.ou.common.Common;
-import com.ou.common.Enums;
-import com.ou.usbtp.CallBack;
-import com.ou.usbtp.DetectUsbThread;
-import com.ou.usbtp.Function;
+import com.ou.base.CallBack;
+import com.ou.base.Function;
+import com.ou.common.ComFunc;
+import com.ou.common.Constant;
+import com.ou.thread.DetectUsbThread;
 import com.ou.usbtp.R;
 
 import android.app.Activity;
@@ -55,10 +55,10 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 		mBtnUpgrade.setOnClickListener(this);
 		mTv.setOnClickListener(this);
 		mHandler = new UIMessageHandler();
-		mTv.setText(Common.getString(this, R.string.device_no_found));
-		mDetectThread = new DetectUsbThread(getApplicationContext(), this);
+		mTv.setText(ComFunc.getString(this, R.string.device_no_found));
+		mDetectThread = new DetectUsbThread(getApplicationContext());
 		mDetectThread.start();
-		Common.log("demo onCreate");
+		ComFunc.log("demo onCreate");
 		
 	}
 
@@ -69,7 +69,7 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 
 	@Override
 	protected void onDestroy() {
-		Common.log("demo onDestroy");
+		ComFunc.log("demo onDestroy");
 		mDetectThread.release();
 		super.onDestroy();
 	}
@@ -90,14 +90,14 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 		case R.id.buttonId:
 			r = DetectUsbThread.isUsbEnable();
 			if (r == false) {
-				mTv.append(Common.getString(getApplicationContext(), R.string.device_no_open) + "\n");
+				mTv.append(ComFunc.getString(getApplicationContext(), R.string.device_no_open) + "\n");
 				break;
 			}
 
 			mFunc = DetectUsbThread.getUsbFunction();
 			String s = mFunc.getFramewareId();
 			if (s == null) {
-				mTv.append(Common.getString(getApplicationContext(), R.string.get_id_fail) + "\n");
+				mTv.append(ComFunc.getString(getApplicationContext(), R.string.get_id_fail) + "\n");
 				break;
 			}
 			mTv.append(s + "\n");
@@ -106,7 +106,7 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 		case R.id.buttonSetting:
 			r = DetectUsbThread.isUsbEnable();
 			if (r == false) {
-				mTv.append(Common.getString(getApplicationContext(), R.string.device_no_open) + "\n");
+				mTv.append(ComFunc.getString(getApplicationContext(), R.string.device_no_open) + "\n");
 				break;
 			}
 			
@@ -119,18 +119,18 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 		case R.id.buttonHardwareTest:
 			r = DetectUsbThread.isUsbEnable();
 			if (r == false) {
-				mTv.append(Common.getString(getApplicationContext(), R.string.device_no_open) + "\n");
+				mTv.append(ComFunc.getString(getApplicationContext(), R.string.device_no_open) + "\n");
 				break;
 			}
 			
 			mFunc = DetectUsbThread.getUsbFunction();
-			byte[] bs = mFunc.readBroadInfo();
+			byte[] bs = mFunc.readBroadInfo().getBuffer();
 			int size = mFunc.readBroadInfoScreenSize();
 
 			Intent intent = new Intent(this, HardwareTestAcitivity.class);
-			intent.putExtra(Enums.INTENT_BUFF, bs);
-			intent.putExtra(Enums.INTENT_SIZE, size);
-			Common.log("before 0:" + bs[0] + " 1:" + bs[1]);
+			intent.putExtra(Constant.INTENT_BUFF, bs);
+			intent.putExtra(Constant.INTENT_SIZE, size);
+			ComFunc.log("before 0:" + bs[0] + " 1:" + bs[1]);
 			startActivity(intent);
 			
 			break;
@@ -141,7 +141,7 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 		case R.id.buttonCal:
 			r = DetectUsbThread.isUsbEnable();
 			if (r == false) {
-				mTv.append(Common.getString(getApplicationContext(), R.string.device_no_open) + "\n");
+				mTv.append(ComFunc.getString(getApplicationContext(), R.string.device_no_open) + "\n");
 				break;
 			}
 			
@@ -151,7 +151,7 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 		case R.id.buttonUpgrde:
 			r = DetectUsbThread.isUsbEnable();
 			if (r == false) {
-				mTv.append(Common.getString(getApplicationContext(), R.string.device_no_open) + "\n");
+				mTv.append(ComFunc.getString(getApplicationContext(), R.string.device_no_open) + "\n");
 				break;
 			}
 
@@ -171,8 +171,8 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 	private boolean ensureUpdate(final Intent data) {
 		 AlertDialog.Builder build = new Builder(this);
 		
-		 build.setMessage(Common.getString(this, R.string.upgrade_ensure));
-		 build.setPositiveButton(Common.getString(mApp, R.string.ok),new android.content.DialogInterface.OnClickListener() {
+		 build.setMessage(ComFunc.getString(this, R.string.upgrade_ensure));
+		 build.setPositiveButton(ComFunc.getString(mApp, R.string.ok),new android.content.DialogInterface.OnClickListener() {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -186,7 +186,7 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 		
 		});
 		 
-		 build.setNegativeButton(Common.getString(mApp, R.string.cancel),new android.content.DialogInterface.OnClickListener() {
+		 build.setNegativeButton(ComFunc.getString(mApp, R.string.cancel),new android.content.DialogInterface.OnClickListener() {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
@@ -219,7 +219,7 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 					return;
 				
 				ensureUpdate(data);
-				Common.log("resultCode:" + resultCode);
+				ComFunc.log("resultCode:" + resultCode);
 			
 
 			}
@@ -236,7 +236,7 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 			mTv.setText(mFunc.getShortDesc(this));
 		}
 		else {
-			mTv.setText(Common.getString(this, R.string.device_no_found));
+			mTv.setText(ComFunc.getString(this, R.string.device_no_found));
 		}
 		
 	}

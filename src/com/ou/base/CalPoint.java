@@ -1,4 +1,4 @@
-package com.ou.usbtp;
+package com.ou.base;
 
 public class CalPoint {
 	short mX0 = 0;

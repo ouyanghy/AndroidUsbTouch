@@ -1,6 +1,6 @@
 package com.ou.common;
 
-public class Enums {	
+public class Constant {	
 	public static final int REPORT_ID_OUT_CMD = 0x5;
 
 	public static final int CMD_SET_MODE = 0x3;
@@ -98,6 +98,17 @@ public class Enums {
 	public static final int MSG_UPDATE_IMAGE = 40;
 	public static final int MSG_GET_CAL_POINT = 41;
 	public static final int MSG_GET_CAL_POINT_TIME_OUT = 42;
+	public static final int MSG_SHORTCUT_POINT_ERR = 43;
+	public static final int MSG_SHORTCUT_POINT_SUCC = 44;
+	public static final int MSG_SHORTCUT_POINT_WRITE_ERR = 45;
+	public static final int MSG_SHORTCUT_POINT_WRITE_SUCC = 46;
+	public static final int MSG_SHORTCUT_NEED_FINISH = 47;
+	public static final int MSG_SHORTCUT_FINISH_INDEX = 48;
+	
+	public static final int MSG_SHORTCUT_WRITE_ERR = 49;
+	public static final int MSG_SHORTCUT_WRITE_SUCC = 50;
+	
+	public static final int MSG_SETTING_NOT_CMP = 51;
 	
 	public static final int [] BOARD_CONFIG_SIZE = {
 		100,23,37,47,65,67,77,66
@@ -128,6 +139,11 @@ public class Enums {
 	
 	public static final String FIRST_BLOOD = "first open ";
 	public static final int CAL_POINT_TIMEOUT = 10 * 1000;
+	public static final int ZONE_LEFT = 0;
+	public static final int ZONE_RIGHT = 1;
+	public static final int ZONE_BOTTOM = 2;
+	public static final int ZONE_TOP =3;
+	public static final int ZONE_SIZE =4;
 	
 	public static final  String ACTION_USB_PERMISSION = "com.ou.usb.tp";
 	public static final String [] BOARD_CONFIG_TITLE = {

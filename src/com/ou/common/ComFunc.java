@@ -1,11 +1,14 @@
 package com.ou.common;
 
+import com.ou.ui.UIMessageHandler;
+
 import android.content.Context;
+import android.os.Handler;
 import android.util.Log;
 
-public class Common {
+public class ComFunc {
 	private static final String TAG = "MLog";
-
+	static UIMessageHandler mHandler = new UIMessageHandler();
 	public static void log(String note, byte[] buffer, int len) {
 		String s = "";
 		s += note;
@@ -108,4 +111,11 @@ public class Common {
 			return context.getResources().getString(id);
 	}
 	
+	public static void sendMessage( int what, Context c) {
+		mHandler.obtainMessage(what, c).sendToTarget();
+	}
+	
+	public static void sendMessage( int what, int arg1, Context c) {
+		mHandler.obtainMessage(what, arg1, 0, c).sendToTarget();
+	}
 }

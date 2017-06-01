@@ -3,11 +3,11 @@ package com.ou.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.ou.common.Common;
-import com.ou.common.Enums;
-import com.ou.usbtp.BoardConfig;
-import com.ou.usbtp.CalInfo;
-import com.ou.usbtp.Function;
+import com.ou.base.BoardConfig;
+import com.ou.base.CalInfo;
+import com.ou.base.Function;
+import com.ou.common.ComFunc;
+import com.ou.common.Constant;
 import com.ou.usbtp.R;
 
 import android.app.Dialog;
@@ -20,20 +20,21 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.RadioGroup;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 public class SettingDialog extends Dialog implements OnClickListener {
 	private Spinner mSpinnerOre, mSpinnerScreenSize;
 	private Function mFunc;
-	private UIMessageHandler mHandler;
 	private Button mBtnOk, mBtnCancel, mBtnReset, mBtnCalClear;
 	private boolean bInit = false;
 	final DetectFinishHandler mDetectHandler;
+	TextView mTvSize;
 	RadioGroup mRadioScreenDirection;
 
 	public SettingDialog(Context context, Function func) {
 		super(context);
 		setContentView(R.layout.setting_dialog);
-		String title = Common.getString(getContext(), R.string.setting_title);
+		String title = ComFunc.getString(getContext(), R.string.setting_title);
 		setTitle(title);
 
 		mBtnOk = (Button) findViewById(R.id.buttonSettingOk);
@@ -43,28 +44,24 @@ public class SettingDialog extends Dialog implements OnClickListener {
 		mSpinnerOre = (Spinner) findViewById(R.id.spinnerOre);
 		mSpinnerScreenSize = (Spinner) findViewById(R.id.spinnerScreenSize);
 		mRadioScreenDirection = (RadioGroup) findViewById(R.id.radioGroup1);
+		mTvSize = (TextView) findViewById(R.id.textViewScreenSize);
 		mBtnOk.setOnClickListener(this);
 		mBtnCancel.setOnClickListener(this);
 		mBtnReset.setOnClickListener(this);
 		mBtnCalClear.setOnClickListener(this);
 
 		mFunc = func;
-		mHandler = new UIMessageHandler();
-		 mDetectHandler = new DetectFinishHandler();
-		//initSetting();
-		//loadAllBroadInfo();
-		initBackGround(Enums.MSG_SETTING_INIT_SUCC, Enums.MSG_SETTING_INIT_ERR);
-	}
+		mDetectHandler = new DetectFinishHandler();
 
-	private void sendMessage(int what) {
-		mHandler.obtainMessage(what, getContext()).sendToTarget();
+		loadAllBroadInfo();
+		initBackGround(Constant.MSG_SETTING_INIT_SUCC, Constant.IGNORE);
 	}
 
 	@Override
 	public void dismiss() {
-		byte ret[] = mFunc.switchMode(Enums.TOUCH_MODE);
+		byte ret[] = mFunc.switchMode(Constant.TOUCH_MODE);
 		if (ret == null) {
-			sendMessage(Enums.MSG_TOUCH_MODE_ERR);
+			ComFunc.sendMessage(Constant.MSG_TOUCH_MODE_ERR, getContext());
 		}
 
 		super.dismiss();
@@ -72,7 +69,7 @@ public class SettingDialog extends Dialog implements OnClickListener {
 
 	private void loadAllBroadInfo() {
 		List<String> list = new ArrayList<String>();
-		for (String title : Enums.BOARD_CONFIG_TITLE) {
+		for (String title : Constant.BOARD_CONFIG_TITLE) {
 			list.add(title);
 		}
 
@@ -83,30 +80,19 @@ public class SettingDialog extends Dialog implements OnClickListener {
 	}
 
 	private BoardConfig parseBroadInfo() {
-		int size = mFunc.readBroadInfoScreenSize();
-		if (size < 0) {
-			Common.log("get size fail");
-			return null;
-		}
-		// Common.log("===size:" + size);
-		Common.sleep(20);
-		byte[] buf = mFunc.readBroadInfo();
-		if (buf == null) {
-			sendMessage(Enums.MSG_READ_BOARD_INFO_ERR);
-			return null;
-		}
 
-		BoardConfig read_ic = new BoardConfig(Enums.READ_FROM_IC);
-		read_ic.setBuffer(buf);
-		read_ic.setSize(size);
+		BoardConfig conf = mFunc.readBroadInfo();
+		if (conf == null) {
+			return null;
+		}
 
 		boolean b = false;
-		for (int i = 0; i < Enums.BOARD_CONFIG_SIZE.length; i++) {
+		for (int i = 0; i < Constant.BOARD_CONFIG_SIZE.length; i++) {
 			BoardConfig con = new BoardConfig(i);
-			b = con.equals(read_ic);
+			b = con.equals(conf);
 			if (b) {
-				read_ic = con;
-				return read_ic;
+				conf = con;
+				return conf;
 			}
 		}
 
@@ -115,17 +101,16 @@ public class SettingDialog extends Dialog implements OnClickListener {
 	}
 
 	final int INIT_FINISH = 1;
-	
-	
+
 	private class DetectFinishHandler extends Handler {
 		@Override
 		public void handleMessage(Message msg) {
 			if (msg.what == INIT_FINISH) {
 				int ore = msg.arg1;
 				int index = msg.arg2;
-				if (index == Enums.IGNORE)
+				if (index == Constant.IGNORE)
 					index = 0;
-				
+
 				if (ore > 0 && ore < 5) {
 					mRadioScreenDirection.check(R.id.radioVer);
 
@@ -134,13 +119,23 @@ public class SettingDialog extends Dialog implements OnClickListener {
 				}
 				mSpinnerOre.setSelection(ore);
 				mSpinnerScreenSize.setSelection(index);
+
+				BoardConfig conf = (BoardConfig) msg.obj;
+				String s = ComFunc.getString(getContext(), R.string.setting_screen_info);
+				s += ": ";
+				s += conf.getSize();
+				s += "'";
+				s += "(" + conf.getXLedNumber() + "*" + conf.getYLedNumber() + ")";
+				mTvSize.setText(s);
 			}
+
 		}
 	}
+
 	private void initBackGround(final int notice_id_succ, final int notice_id_fail) {
-		
+
 		Runnable r = new Runnable() {
-			
+
 			@Override
 			public void run() {
 				// TODO Auto-generated method stub
@@ -148,22 +143,22 @@ public class SettingDialog extends Dialog implements OnClickListener {
 				bInit = true;
 			}
 		};
-		
+
 		new Thread(r).start();
 
 	}
 
 	private void initSetting(int notice_id_succ, int notice_id_fail) {
-		byte ret[] = mFunc.switchMode(Enums.SET_MODE);
+		byte ret[] = mFunc.switchMode(Constant.SET_MODE);
 		if (ret == null) {
-			sendMessage(Enums.MSG_SET_MODE_ERR);
+			ComFunc.sendMessage(Constant.MSG_SET_MODE_ERR, getContext());
 			return;
 		}
 
-		Common.sleep(20);
+		ComFunc.sleep(20);
 		CalInfo calInfo = mFunc.readCalInfo();
 		if (calInfo == null) {
-			sendMessage(Enums.MSG_READ_BOARD_INFO_ERR);
+			ComFunc.sendMessage(Constant.MSG_READ_BOARD_INFO_ERR, getContext());
 			return;
 		}
 		// notice(calInfo.toString());
@@ -173,58 +168,56 @@ public class SettingDialog extends Dialog implements OnClickListener {
 			// notice("initSetting screen direction error");
 			ore = 0;
 		}
-		//mSpinnerOre.setSelection(ore);
+		// mSpinnerOre.setSelection(ore);
 		// notice("ore:" + ore);
-		/*if (calInfo.getScreenDirection() > 0 && calInfo.getScreenDirection() < 5) {
-			mRadioScreenDirection.check(R.id.radioVer);
+		/*
+		 * if (calInfo.getScreenDirection() > 0 && calInfo.getScreenDirection()
+		 * < 5) { mRadioScreenDirection.check(R.id.radioVer);
+		 * 
+		 * } else { mRadioScreenDirection.check(R.id.radioHor); }
+		 */
 
-		} else {
-			mRadioScreenDirection.check(R.id.radioHor);
-		}
-*/
-		
 		BoardConfig config = parseBroadInfo();
 		if (config != null) {
-			// notice("find config");
-			//mSpinnerScreenSize.setSelection(config.getIndex());
-			mDetectHandler.obtainMessage(INIT_FINISH, ore, config.getIndex()).sendToTarget();
-			sendMessage(notice_id_succ);
+			if (notice_id_succ != Constant.IGNORE)
+				ComFunc.sendMessage(notice_id_succ, getContext());
+			mDetectHandler.obtainMessage(INIT_FINISH, ore, config.getIndex(), config).sendToTarget();
 		} else {
-			sendMessage(notice_id_fail);
-			mDetectHandler.obtainMessage(INIT_FINISH, ore, Enums.IGNORE).sendToTarget();
+			if (notice_id_succ != Constant.IGNORE)
+				ComFunc.sendMessage(notice_id_fail, getContext());
+			mDetectHandler.obtainMessage(INIT_FINISH, ore, Constant.IGNORE, config).sendToTarget();
 
 		}
-	
+
 	}
 
 	private boolean updateCalInfo(int dir, int matrix_flag) {
 		CalInfo info = mFunc.readCalInfo();
 		boolean r = false;
 		if (info == null) {
-			sendMessage(Enums.MSG_READ_CAL_INFO_ERR);
+			ComFunc.sendMessage(Constant.MSG_READ_CAL_INFO_ERR, getContext());
 			return false;
 		}
 
-		if (matrix_flag != Enums.IGNORE)
+		if (matrix_flag != Constant.IGNORE)
 			info.setMatrixFlag(matrix_flag);
-		
-		if (dir != Enums.IGNORE)
+
+		if (dir != Constant.IGNORE)
 			info.setScreenDirection(dir);
-		
-		Common.sleep(20);
+
+		ComFunc.sleep(20);
 		r = mFunc.eraseCalInfo();
 		if (r == false) {
-			sendMessage(Enums.MSG_ERASE_CAL_INFO_ERR);
+			ComFunc.sendMessage(Constant.MSG_ERASE_CAL_INFO_ERR, getContext());
 			return false;
 		}
 
-		Common.sleep(20);
+		ComFunc.sleep(20);
 		// dir = mSpinnerOre.getSelectedItemPosition();
-	
 
 		r = mFunc.writeCalInfo(info);
 		if (r == false) {
-			sendMessage(Enums.MSG_WRITE_CAL_INFO_ERR);
+			ComFunc.sendMessage(Constant.MSG_WRITE_CAL_INFO_ERR, getContext());
 			return false;
 		}
 
@@ -232,9 +225,9 @@ public class SettingDialog extends Dialog implements OnClickListener {
 	}
 
 	private boolean updateBroadInfo() {
-		byte[] ret = mFunc.eraseBroadInfo();
-		if (ret == null) {
-			sendMessage(Enums.MSG_ERASE_BOARD_INFO_ERR);
+		boolean ret = mFunc.eraseBroadInfo();
+		if (ret == false) {
+			ComFunc.sendMessage(Constant.MSG_ERASE_BOARD_INFO_ERR, getContext());
 			return false;
 		}
 
@@ -242,8 +235,8 @@ public class SettingDialog extends Dialog implements OnClickListener {
 
 		BoardConfig config = new BoardConfig(index);
 		ret = mFunc.writeBroadInfo(config);
-		if (ret == null) {
-			sendMessage(Enums.MSG_WRITE_BOARD_INFO_ERR);
+		if (ret == false) {
+			ComFunc.sendMessage(Constant.MSG_WRITE_BOARD_INFO_ERR, getContext());
 			return false;
 		}
 
@@ -255,30 +248,31 @@ public class SettingDialog extends Dialog implements OnClickListener {
 	}
 
 	private boolean clearCalInfo() {
-		return updateCalInfo(Enums.IGNORE, 0);
+		return updateCalInfo(Constant.IGNORE, 0);
 	}
+
 	@Override
 	public void onClick(View v) {
 		// TODO Auto-generated method stub
 		if (bInit == false)
 			return;
-		
+
 		switch (v.getId()) {
 		case R.id.buttonSettingOk: {
 			boolean r = updateBroadInfo();
 			if (r == false) {
-				sendMessage(Enums.MSG_SETTING_OK_ERR);
+				ComFunc.sendMessage(Constant.MSG_SETTING_OK_ERR, getContext());
 				dismiss();
 				break;
 			}
 
-			Common.sleep(40);
+			ComFunc.sleep(40);
 			int dir = mSpinnerOre.getSelectedItemPosition();
-			r = updateCalInfo(dir,Enums.IGNORE);
+			r = updateCalInfo(dir, Constant.IGNORE);
 			if (r == false)
-				sendMessage(Enums.MSG_SETTING_OK_ERR);
+				ComFunc.sendMessage(Constant.MSG_SETTING_OK_ERR, getContext());
 			else {
-				sendMessage(Enums.MSG_SETTING_OK_SUCC);
+				ComFunc.sendMessage(Constant.MSG_SETTING_OK_SUCC, getContext());
 
 			}
 			dismiss();
@@ -290,15 +284,15 @@ public class SettingDialog extends Dialog implements OnClickListener {
 			break;
 
 		case R.id.buttonSettingReset: {
-			initBackGround(Enums.MSG_SETTING_RESET_SUCC, Enums.MSG_SETTING_RESET_ERR);
+			initBackGround(Constant.MSG_SETTING_RESET_SUCC, Constant.MSG_SETTING_RESET_ERR);
 			break;
 		}
 		case R.id.buttonSettingCalClear:
 			boolean r = clearCalInfo();
 			if (r)
-				sendMessage(Enums.MSG_SETTING_CLEAR_SUCC);
+				ComFunc.sendMessage(Constant.MSG_SETTING_CLEAR_SUCC, getContext());
 			else
-				sendMessage(Enums.MSG_SETTING_CLEAR_ERR);
+				ComFunc.sendMessage(Constant.MSG_SETTING_CLEAR_ERR, getContext());
 
 		}
 	}

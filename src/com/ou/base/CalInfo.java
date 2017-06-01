@@ -1,6 +1,6 @@
-package com.ou.usbtp;
+package com.ou.base;
 
-import com.ou.common.Common;
+import com.ou.common.ComFunc;
 
 public class CalInfo {
 	byte [] mCalPoints = new byte[32];
@@ -55,7 +55,7 @@ public class CalInfo {
     }
     
     public void parse(byte bs[]) {
-		Common.memcmp(mCalPoints, bs, mCalPoints.length);
+		ComFunc.memcmp(mCalPoints, bs, mCalPoints.length);
 		
 		mScreenDirection = bs [CMD_START_INDEX];
 		mOsSupport = bs[CMD_START_INDEX + 1];
@@ -77,8 +77,8 @@ public class CalInfo {
     public byte [] toByte() {
     	
     	mBuffer = new byte[SIZE];
-    	Common.memset(mBuffer, 0x00, SIZE);
-    	Common.memcpy(mBuffer, mCalPoints, mCalPoints.length);
+    	ComFunc.memset(mBuffer, 0x00, SIZE);
+    	ComFunc.memcpy(mBuffer, mCalPoints, mCalPoints.length);
     	mBuffer[CMD_START_INDEX] = mScreenDirection;
     	mBuffer[CMD_START_INDEX + 1] = mOsSupport;
     	mBuffer[CMD_START_INDEX + 2] = (byte) (mOsType & 0xFF);
@@ -97,7 +97,7 @@ public class CalInfo {
     }
     
     public static boolean compare(CalInfo a, CalInfo b) {
-    	return Common.memcmp(a.toByte(), b.toByte(), SIZE);
+    	return ComFunc.memcmp(a.toByte(), b.toByte(), SIZE);
     }
     @Override
     public String toString() {

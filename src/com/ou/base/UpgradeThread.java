@@ -1,9 +1,10 @@
-package com.ou.usbtp;
+package com.ou.base;
 
 import java.io.File;
 
-import com.ou.common.Common;
-import com.ou.common.Enums;
+import com.ou.common.ComFunc;
+import com.ou.common.Constant;
+import com.ou.thread.DetectUsbThread;
 import com.ou.ui.UIMessageHandler;
 
 import android.content.Context;
@@ -38,27 +39,27 @@ public class UpgradeThread extends Thread {
 		bWorkState = true;
 		boolean r = false;
 		if (mData == null) {
-			sendMessage(Enums.MSG_FILE_INVAILD);
+			sendMessage(Constant.MSG_FILE_INVAILD);
 			bWorkState = false;
 			return;
 		}
 
 		Uri u = mData.getData();
 		if (u == null) {
-			sendMessage(Enums.MSG_FILE_INVAILD);
+			sendMessage(Constant.MSG_FILE_INVAILD);
 			bWorkState = false;
 			return;
 		}
 		String path = u.getPath();
 		if (path == null) {
 			bWorkState = false;
-			sendMessage(Enums.MSG_FILE_INVAILD);
+			sendMessage(Constant.MSG_FILE_INVAILD);
 			return;
 		}
 
 		File f = new File(path);
 		if (f.exists() == false || f.canRead() == false) {
-			sendMessage(Enums.MSG_FILE_INVAILD);
+			sendMessage(Constant.MSG_FILE_INVAILD);
 			bWorkState = false;
 			return;
 		}
@@ -66,20 +67,20 @@ public class UpgradeThread extends Thread {
 		
 		r = mFunc.prepareUpgrade();
 		if (r) {
-			Common.sleep(2000);
+			ComFunc.sleep(2000);
 			int cnt = 0;
 			
 			do {
-				Common.sleep(100);
+				ComFunc.sleep(100);
 				if (cnt++ > 100) {
-					Common.log("switch fail test");
+					ComFunc.log("switch fail test");
 					return;
 				}
 				
 			} while(DetectUsbThread.isUsbEnable() == false);
 			
 		} else {
-			Common.log("prepareUpgrade fail");
+			ComFunc.log("prepareUpgrade fail");
 		}
 			
 		mFunc = DetectUsbThread.getUsbFunction();
@@ -89,11 +90,11 @@ public class UpgradeThread extends Thread {
 		ret = mFunc.upgradeFirmware(f);
 
 		if (ret == false) {
-			sendMessage(Enums.MSG_UPGRADE_ERR);
+			sendMessage(Constant.MSG_UPGRADE_ERR);
 		} else {
 			//sendMessage(Enums.MSG_UPGRADE_SUCC);
 		}
-		Common.log("path:" + path);
+		ComFunc.log("path:" + path);
 		bWorkState = false;
 	}
 

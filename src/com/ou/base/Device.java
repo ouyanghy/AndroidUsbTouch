@@ -1,9 +1,9 @@
-package com.ou.usbtp;
+package com.ou.base;
 
 import java.util.HashMap;
 
-import com.ou.common.Common;
-import com.ou.common.Enums;
+import com.ou.common.ComFunc;
+import com.ou.common.Constant;
 
 import android.app.PendingIntent;
 import android.content.Context;
@@ -147,10 +147,10 @@ public class Device {
 		length = len;
 		
 		byte [] data = new byte[0x40];
-		Common.memset(data, 0x00, data.length);
+		ComFunc.memset(data, 0x00, data.length);
 	//	bs = new byte[0x40];
 		if (len < 0x40) {
-			Common.memcpy(data, buffer, 0, 0, len);
+			ComFunc.memcpy(data, buffer, 0, 0, len);
 			length = 0x40;
 		}else 
 			data = buffer;
@@ -158,7 +158,7 @@ public class Device {
 	//	Common.log("send:", data, data.length);
 		ret = mUsbConnect.controlTransfer(requestType, request, value, index, data, length, 1000);
 		if (ret < 0) {
-			Common.log("send ret null,ret:" + ret);
+			ComFunc.log("send ret null,ret:" + ret);
 			return null;
 		}
 		return data;
@@ -178,13 +178,13 @@ public class Device {
 		index = mInterface;
 		length = len;
 		bs = new byte[len];
-		Common.memset(bs, 0x00, bs.length);
+		ComFunc.memset(bs, 0x00, bs.length);
 		// bs[0] = 6;
 		// bs[1] = 3;
 
 		ret = mUsbConnect.controlTransfer(requestType, request, value, index, bs, length, 1000);
 		if (ret < 0) {
-			Common.log("recv ret null");
+			ComFunc.log("recv ret null");
 			return null;
 		}
 	//	Common.log("recv:", bs, bs.length);
@@ -231,7 +231,7 @@ public class Device {
 		s += ("product: " + stringProduct + "\n");
 		//recvResult();
 		
-		Common.log("s");
+		ComFunc.log("s");
 		return s;
 	}
 
@@ -260,9 +260,9 @@ public class Device {
 			if (vid == VID) {
 				
 				if (pid == PID_NORMAL)
-					mInterface = Enums.DEVICE_INTERFACE_NORMAL;
+					mInterface = Constant.DEVICE_INTERFACE_NORMAL;
 				else 
-					mInterface = Enums.DEVICE_INTEFFACE_BOOT;
+					mInterface = Constant.DEVICE_INTEFFACE_BOOT;
 				
 				Log.i(TAG, "usb find tp usb,interface:" + mInterface);
 				return usb;
@@ -297,7 +297,7 @@ public class Device {
 	}
 	
 	public void requestPermission() {
-		PendingIntent mPermissionIntent = PendingIntent.getBroadcast(mContext, 0, new Intent(Enums.ACTION_USB_PERMISSION), 0);
+		PendingIntent mPermissionIntent = PendingIntent.getBroadcast(mContext, 0, new Intent(Constant.ACTION_USB_PERMISSION), 0);
 		mManager.requestPermission(mUsb, mPermissionIntent);
 	}
 	
