@@ -3,7 +3,6 @@ package com.ou.common;
 import com.ou.ui.UIMessageHandler;
 
 import android.content.Context;
-import android.os.Handler;
 import android.util.Log;
 
 public class ComFunc {
@@ -29,7 +28,11 @@ public class ComFunc {
 	public static void log(String note) {
 		Log.i(TAG, note);
 	}
-	
+	public static void memset(int[] bs, int val, int len) {
+		for (int i = 0; i < len; i++)
+			bs[i] = val;
+	}
+
 	public static void memset(byte[] bs, int val, int len) {
 		for (int i = 0; i < len; i++)
 			bs[i] = (byte) val;

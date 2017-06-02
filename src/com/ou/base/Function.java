@@ -14,7 +14,7 @@ import android.graphics.PointF;
 public class Function extends Constant {
 	private Device mUsb;
 	private static Function mThis = null;
-
+	private int mProgress = Constant.PROGRESS_UNSTART;
 	public Function(Device t) {
 		mUsb = t;
 		mThis = this;
@@ -27,20 +27,21 @@ public class Function extends Constant {
 	public String getDescrption() {
 		return mUsb.getDescrption();
 	}
-	
+
 	public int getPid() {
-			return mUsb.getPid();
+		return mUsb.getPid();
 	}
-	
+
 	public int getVid() {
 		return mUsb.getVid();
 	}
-	
-	public String  getShortDesc(Context context) {
+
+	public String getShortDesc(Context context) {
 		if (getTpUsbFunction() == null)
 			return ComFunc.getString(context, R.string.device_no_found);
 		return mUsb.getShortDesc();
 	}
+
 	/* private function */
 	private byte[] getReadCommandHead(int addr, int len) {
 		byte[] bs = new byte[7];
@@ -160,38 +161,7 @@ public class Function extends Constant {
 		return ret;
 	}
 
-	/* public funciton */
-	public byte[] switchMode(int mode) {
-		byte[] bs = { REPORT_ID_OUT_CMD, CMD_SET_MODE, (byte) mode };
-		byte[] ret = mUsb.sendCommand(bs, bs.length);
-		ComFunc.sleep(20);
-		ret = recvResult();
-
-		return ret;
-	}
-
-	public String getFramewareId() {
-		byte[] bs = __getFramewareId();
-		if (bs == null)
-			return null;
-
-		int start = 8;
-		String s = bs[start + 3] + "." + bs[start + 2] + "." + bs[start];
-		return s;
-	}
-
-	public CalInfo readCalInfo() {
-		byte[] bs = __getCalInfo();
-		CalInfo cal = new CalInfo();
-		if (bs == null)
-			return null;
-
-		byte []data = ComFunc.memcut(bs, 8, bs.length - 8);
-		cal.parse(data);
-		return cal;
-	}
-
-	public byte[] __eraseCalInfo() {
+	private byte[] __eraseCalInfo() {
 		int addr = CALIB_INFO_ADDR | EXTERNAL_FLASH_ADDRESS;
 
 		byte[] head = getEraseHead(addr, 1);
@@ -211,15 +181,6 @@ public class Function extends Constant {
 
 		return ret;
 	}
-	
-	public boolean eraseCalInfo() {
-		byte [] ret = __eraseCalInfo();
-		if (ret == null)
-			return false;
-		
-		return true;
-		
-	}
 
 	private byte[] recvResult() {
 
@@ -227,6 +188,9 @@ public class Function extends Constant {
 	}
 
 	private byte[] recvResult(int len) {
+		if (!mUsb.isAvail())
+			return null;
+
 		int cnt = 0;
 		byte[] ret;
 		ComFunc.sleep(20);
@@ -255,7 +219,7 @@ public class Function extends Constant {
 		return ret;
 	}
 
-	public byte[] __writeCalInfo(CalInfo info) {
+	private byte[] __writeCalInfo(CalInfo info) {
 		info.setCheckFlag(0x434F4E46);
 		byte[] data = info.toByte();
 		int addr = CALIB_INFO_ADDR | EXTERNAL_FLASH_ADDRESS;
@@ -272,16 +236,8 @@ public class Function extends Constant {
 
 		return ret;
 	}
-	
-	public boolean writeCalInfo(CalInfo info) {
-		byte [] ret = __writeCalInfo(info);
-		if (ret == null)
-			return false;
-		
-		return true;
-	}
 
-	public byte[] __eraseBroadInfo() {
+	private byte[] __eraseBroadInfo() {
 		int addr = BOARD_INFO_ADDR | EXTERNAL_FLASH_ADDRESS;
 
 		byte[] head = getEraseHead(addr, 1);
@@ -296,35 +252,21 @@ public class Function extends Constant {
 			return null;
 		}
 
-	//	ComFunc.sleep(40);
-		//ComFunc.log("enter==>");
+		// ComFunc.sleep(40);
+		// ComFunc.log("enter==>");
 		ret = recvResult();
-		//ComFunc.log("exit<==");
+		// ComFunc.log("exit<==");
 		return ret;
 	}
 
-	public boolean eraseBroadInfo() {
-		byte [] ret = __eraseBroadInfo();
-		if (ret == null)
-			return false;
-		return true;
-	}
-	
-	public boolean writeBroadInfo(BoardConfig con) {
-		byte []ret = __writeBroadInfo(con);
-		if (ret == null)
-			return false;
-		
-		return true;
-	}
-	public byte[] __writeBroadInfo(BoardConfig con) {
+	private byte[] __writeBroadInfo(BoardConfig con) {
 		/* write config */
 
 		byte[] config = con.getBuffer();
 		int size = con.getSize();
 		int addr = (BOARD_INFO_ADDR + 4) | EXTERNAL_FLASH_ADDRESS;
-		
-		byte [] ret = sendBlockData(addr, config, config.length);
+
+		byte[] ret = sendBlockData(addr, config, config.length);
 		if (ret == null)
 			return null;
 
@@ -335,50 +277,13 @@ public class Function extends Constant {
 		bs[1] = (byte) ((size & 0xff00) >> 8);
 		addr = (BOARD_INFO_ADDR) | EXTERNAL_FLASH_ADDRESS;
 		byte[] command = getWriteCommandHead(addr, bs.length, bs);
-		 ret = mUsb.sendCommand(command, command.length);
+		ret = mUsb.sendCommand(command, command.length);
 		if (ret == null)
 			return null;
 
 		ret = recvResult();
 
 		return ret;
-	}
-
-	public int readBroadInfoScreenSize() {
-		int addr = (BOARD_INFO_ADDR) | EXTERNAL_FLASH_ADDRESS;
-		byte[] command = getReadCommandHead(addr, 4);
-		byte[] ret = mUsb.sendCommand(command, command.length);
-		if (ret == null)
-			return -1;
-		ComFunc.sleep(20);
-		ret = recvResult();
-		if (ret == null)
-			return -1;
-
-		int size = ret[PACKAGE_RECV_DATA_START + 0] | ret[PACKAGE_RECV_DATA_START + 1] >> 8
-				| ret[PACKAGE_RECV_DATA_START + 2] >> 16 | ret[PACKAGE_RECV_DATA_START + 3] >> 24;
-
-		return size;
-	}
-
-	public BoardConfig readBroadInfo() {
-		int size = readBroadInfoScreenSize();
-		if (size < 0) {
-			ComFunc.log("get size fail");
-			return null;
-		}
-		// Common.log("===size:" + size);
-		ComFunc.sleep(20);
-		byte[] buf = __readBroadInfo();
-		if (buf == null) {
-			return null;
-		}
-
-		BoardConfig read_ic = new BoardConfig(Constant.READ_FROM_IC);
-		read_ic.setBuffer(buf);
-		read_ic.setSize(size);
-		
-		return read_ic;
 	}
 
 	private byte[] __readBroadInfo() {
@@ -428,28 +333,256 @@ public class Function extends Constant {
 
 		ret = recvResult();
 		int point_num = ret[3];
-	//	Common.log("read point:" + point_num);
+		// Common.log("read point:" + point_num);
 		if (point_num == 0)
 			return null;
-		
+
 		ComFunc.sleep(20);
 
-		return ComFunc.memcut(ret, 3, 3+4);
+		return ComFunc.memcut(ret, 3, 3 + 4);
 	}
-	
+
+	private byte[] sendBlockData(int addr, byte[] data_send, int data_len) {
+
+		byte[] ret = null;
+		int addr_org = addr;
+		int roundDownLen = ComFunc.roundDown(data_len, PACKAGE_SEND_LENGTH_LIMIT);
+		for (int j = 0; j < roundDownLen; j += PACKAGE_SEND_LENGTH_LIMIT) {
+			if (!mUsb.isAvail())
+				return null;
+
+			addr = addr_org + j;
+			byte[] data = ComFunc.memcut(data_send, j, PACKAGE_SEND_LENGTH_LIMIT);
+			byte[] command = getWriteCommandHead(addr, PACKAGE_SEND_LENGTH_LIMIT, data);
+			ret = mUsb.sendCommand(command, command.length);
+			if (ret == null)
+				return null;
+
+			ret = recvResult();
+
+		}
+		if (!mUsb.isAvail())
+			return null;
+		/* send left */
+		int remain = data_len - roundDownLen;
+		if (remain > 0) {
+			addr = addr_org + roundDownLen;
+			byte[] data = ComFunc.memcut(data_send, roundDownLen, remain);
+			byte[] command = getWriteCommandHead(addr, remain, data);
+			ret = mUsb.sendCommand(command, command.length);
+			if (ret == null)
+				return null;
+
+			ret = recvResult();
+			if (ret == null)
+				return null;
+		}
+
+		return ret;
+	}
+
+	private boolean upgradeVersion(byte[] version) {
+		if (!mUsb.isAvail())
+			return false;
+
+		int addr_start = (FW_VERSION_ADDR) | EXTERNAL_FLASH_ADDRESS;
+		int addr = addr_start + 4;
+		/* erase */
+
+		byte[] command = getEraseHead(addr, 1);
+		byte[] ret = mUsb.sendCommand(command, command.length);
+		if (ret == null) {
+			ComFunc.log("erase FW_VERSION_ADDR err 0");
+			return false;
+		}
+		ret = recvResult();
+		if (ret == null) {
+			ComFunc.log("erase FW_VERSION_ADDR err 1");
+			return false;
+		}
+		mProgress = 78;
+		/* write fw */
+		command = getWriteCommandHead(addr, 4, version);
+		ret = mUsb.sendCommand(command, command.length);
+		if (ret == null) {
+			ComFunc.log("write FW_VERSION_ADDR err 0");
+			return false;
+		}
+		ret = recvResult();
+		if (ret == null) {
+			ComFunc.log("write FW_VERSION_ADDR err 1");
+			return false;
+
+		}
+		addr = addr_start;
+		byte[] data = { 0x46, 0x49, 0x57, 0x46 };
+		command = getWriteCommandHead(addr, 4, data);
+		ret = mUsb.sendCommand(command, command.length);
+		if (ret == null) {
+			ComFunc.log("write FW_VERSION_ADDR err 2");
+			return false;
+		}
+		ret = recvResult();
+		if (ret == null) {
+			ComFunc.log("write FW_VERSION_ADDR err 3");
+			return false;
+		}
+
+		ret = switchMode(FIRMWARE_MODE);
+		mProgress = PROGRESS_FLASH_FINISH;
+		return true;
+	}
+
+	private byte[] __writeCalKey(byte[] data) {
+		int addr = SHORTCUT_INFO_ADDR | EXTERNAL_FLASH_ADDRESS;
+		byte[] ret = sendBlockData(addr, data, data.length);
+		return ret;
+	}
+
+	/* public funciton */
+	public byte[] switchMode(int mode) {
+		if (!mUsb.isAvail())
+			return null;
+
+		byte[] bs = { REPORT_ID_OUT_CMD, CMD_SET_MODE, (byte) mode };
+		byte[] ret = mUsb.sendCommand(bs, bs.length);
+		ComFunc.sleep(20);
+		ret = recvResult();
+
+		return ret;
+	}
+
+	public String getFramewareId() {
+		if (!mUsb.isAvail())
+			return null;
+
+		byte[] bs = __getFramewareId();
+		if (bs == null)
+			return null;
+
+		int start = 8;
+		String s = bs[start + 3] + "." + bs[start + 2] + "." + bs[start];
+		return s;
+	}
+
+	public CalInfo readCalInfo() {
+		if (!mUsb.isAvail())
+			return null;
+
+		byte[] bs = __getCalInfo();
+		CalInfo cal = new CalInfo();
+		if (bs == null)
+			return null;
+
+		byte[] data = ComFunc.memcut(bs, 8, bs.length - 8);
+		cal.parse(data);
+		return cal;
+	}
+
+	public boolean eraseCalInfo() {
+		if (!mUsb.isAvail())
+			return false;
+
+		byte[] ret = __eraseCalInfo();
+		if (ret == null)
+			return false;
+
+		return true;
+
+	}
+
+	public boolean writeCalInfo(CalInfo info) {
+		if (!mUsb.isAvail())
+			return false;
+
+		byte[] ret = __writeCalInfo(info);
+		if (ret == null)
+			return false;
+
+		return true;
+	}
+
+	public boolean eraseBroadInfo() {
+		if (!mUsb.isAvail())
+			return false;
+
+		byte[] ret = __eraseBroadInfo();
+		if (ret == null)
+			return false;
+		return true;
+	}
+
+	public boolean writeBroadInfo(BoardConfig con) {
+		if (!mUsb.isAvail())
+			return false;
+
+		byte[] ret = __writeBroadInfo(con);
+		if (ret == null)
+			return false;
+
+		return true;
+	}
+
+	public int readBroadInfoScreenSize() {
+		if (!mUsb.isAvail())
+			return -1;
+
+		int addr = (BOARD_INFO_ADDR) | EXTERNAL_FLASH_ADDRESS;
+		byte[] command = getReadCommandHead(addr, 4);
+		byte[] ret = mUsb.sendCommand(command, command.length);
+		if (ret == null)
+			return -1;
+		ComFunc.sleep(20);
+		ret = recvResult();
+		if (ret == null)
+			return -1;
+
+		int size = ret[PACKAGE_RECV_DATA_START + 0] | ret[PACKAGE_RECV_DATA_START + 1] >> 8
+				| ret[PACKAGE_RECV_DATA_START + 2] >> 16 | ret[PACKAGE_RECV_DATA_START + 3] >> 24;
+
+		return size;
+	}
+
+	public BoardConfig readBroadInfo() {
+		if (!mUsb.isAvail())
+			return null;
+
+		int size = readBroadInfoScreenSize();
+		if (size < 0) {
+			ComFunc.log("get size fail");
+			return null;
+		}
+		// Common.log("===size:" + size);
+		ComFunc.sleep(20);
+		byte[] buf = __readBroadInfo();
+		if (buf == null) {
+			return null;
+		}
+
+		BoardConfig read_ic = new BoardConfig(Constant.READ_FROM_IC);
+		read_ic.setBuffer(buf);
+		read_ic.setSize(size);
+
+		return read_ic;
+	}
+
 	public PointF readCalPoint() {
-		byte [] ret = __readCalPoint();
+		if (!mUsb.isAvail())
+			return null;
+
+		byte[] ret = __readCalPoint();
 		if (ret == null || ret.length < 4)
 			return null;
-		
-		float x = ret[0]&0xff | (ret[1]&0xff) << 8;
-		float y = ret[2]&0xff | (ret[3]&0xff) << 8;
+
+		float x = ret[0] & 0xff | (ret[1] & 0xff) << 8;
+		float y = ret[2] & 0xff | (ret[3] & 0xff) << 8;
 		return new PointF(x, y);
-		
+
 	}
 
 	public byte[] readImage(int mode, int len) {
-
+		if (!mUsb.isAvail())
+			return null;
 		// int len = 146;
 		len += 7;
 		byte[] command;
@@ -478,24 +611,26 @@ public class Function extends Constant {
 		return ComFunc.memcut(ret, 7, len - 7);
 	}
 
-	int mProgress = Constant.PROGRESS_UNSTART;
+	
 
 	public void setProgress(int v) {
 		mProgress = v;
 	}
+
 	public int getProgress() {
 		return mProgress;
 	}
 
 	public boolean upgradeFirmware(File f) {
-		
-		boolean r = false;
-		/*r = prepareUpgrade();
-		if (r == false) {
-			mProgress = Enums.PROGRESS_ERR;
-			Common.log("prepareUpgrade fail");
+		if (!mUsb.isAvail())
 			return false;
-		}*/
+
+		boolean r = false;
+		/*
+		 * r = prepareUpgrade(); if (r == false) { mProgress =
+		 * Enums.PROGRESS_ERR; Common.log("prepareUpgrade fail"); return false;
+		 * }
+		 */
 		try {
 			r = upgrade(f);
 		} catch (IOException e) {
@@ -515,6 +650,9 @@ public class Function extends Constant {
 	}
 
 	public boolean prepareUpgrade() {
+		if (!mUsb.isAvail())
+			return false;
+
 		mProgress = Constant.PROGRESS_UNSTART;
 		byte[] ret = switchMode(SET_MODE);
 		if (ret == null) {
@@ -545,42 +683,9 @@ public class Function extends Constant {
 
 	}
 
-	private byte [] sendBlockData(int addr, byte [] data_send, int data_len) {
-		
-		byte[] ret = null;
-		int addr_org = addr;
-		int roundDownLen = ComFunc.roundDown(data_len, PACKAGE_SEND_LENGTH_LIMIT);
-		for (int j = 0; j < roundDownLen; j += PACKAGE_SEND_LENGTH_LIMIT) {
-
-			addr = addr_org + j;
-			byte[] data = ComFunc.memcut(data_send, j, PACKAGE_SEND_LENGTH_LIMIT);
-			byte [] command = getWriteCommandHead(addr, PACKAGE_SEND_LENGTH_LIMIT, data);
-			ret = mUsb.sendCommand(command, command.length);
-			if (ret == null)
-				return null;
-
-			ret = recvResult();
-
-		}
-		
-		/* send  left */
-		int remain = data_len - roundDownLen;
-		if (remain > 0) {
-			addr = addr_org + roundDownLen;
-			byte[] data = ComFunc.memcut(data_send, roundDownLen, remain);
-			byte [] command = getWriteCommandHead(addr, remain, data);
-			ret = mUsb.sendCommand(command, command.length);
-			if (ret == null)
-				return null;
-
-			ret = recvResult();
-			if (ret == null)
-				return null;
-		}
-
-		return ret;
-	}
 	public boolean upgrade(File f) throws IOException {
+		if (!mUsb.isAvail())
+			return false;
 
 		/* read bin data */
 		byte[] buffer = new byte[Constant.KB];
@@ -649,16 +754,14 @@ public class Function extends Constant {
 		offset = 0;
 		if (file_len > 1008) {
 			for (int i = 0; i < 9; i++) {
-				mProgress+=6;// 4~12
+				mProgress += 6;// 4~12
 				int addr = addr_start + i * OUT_LEN;
 				if (i == 8) {
 					dataLen = file_len - 8 * OUT_LEN;
 				} else {
 					dataLen = OUT_LEN;
 				}
-				
-				
-				
+
 				offset = i * OUT_LEN + 8;
 				byte[] data_send = ComFunc.memcut(file_data, offset, dataLen);
 				ret = sendBlockData(addr, data_send, data_send.length);
@@ -690,75 +793,23 @@ public class Function extends Constant {
 		return upgradeVersion(version);
 	}
 
-	private boolean upgradeVersion(byte[] version) {
-		int addr_start = (FW_VERSION_ADDR) | EXTERNAL_FLASH_ADDRESS;
-		int addr = addr_start + 4;
-		/* erase */
-	
-		byte[] command = getEraseHead(addr, 1);
-		byte[] ret = mUsb.sendCommand(command, command.length);
-		if (ret == null) {
-			ComFunc.log("erase FW_VERSION_ADDR err 0");
-			return false;
-		}
-		ret = recvResult();
-		if (ret == null) {
-			ComFunc.log("erase FW_VERSION_ADDR err 1");
-			return false;
-		}
-		mProgress = 78;
-		/* write fw */
-		command = getWriteCommandHead(addr, 4, version);
-		ret = mUsb.sendCommand(command, command.length);
-		if (ret == null) {
-			ComFunc.log("write FW_VERSION_ADDR err 0");
-			return false;
-		}
-		ret = recvResult();
-		if (ret == null) {
-			ComFunc.log("write FW_VERSION_ADDR err 1");
+	public boolean writeCalKey(byte[] data) {
+		if (!mUsb.isAvail())
 			return false;
 
-		}
-		addr = addr_start;
-		byte[] data = { 0x46, 0x49, 0x57, 0x46 };
-		command = getWriteCommandHead(addr, 4, data);
-		ret = mUsb.sendCommand(command, command.length);
-		if (ret == null) {
-			ComFunc.log("write FW_VERSION_ADDR err 2");
-			return false;
-		}
-		ret = recvResult();
-		if (ret == null) {
-			ComFunc.log("write FW_VERSION_ADDR err 3");
-			return false;
-		}
-		
-		ret = switchMode(FIRMWARE_MODE);
-		mProgress = PROGRESS_FLASH_FINISH;
-		return true;
-	}
-	
-	private byte[] __writeCalKey(byte []data) {
-		int addr =  SHORTCUT_INFO_ADDR | EXTERNAL_FLASH_ADDRESS;
-		byte [] ret = sendBlockData(addr, data, data.length);
-		return ret;
-	}
-	
-	public boolean writeCalKey(byte [] data) {
-		byte [] ret = switchMode(SET_MODE);
+		byte[] ret = switchMode(SET_MODE);
 		if (ret == null)
 			return false;
-		
+
 		int addr = SHORTCUT_INFO_ADDR | EXTERNAL_FLASH_ADDRESS;
-		byte [] command = getEraseHead(addr, 1);
+		byte[] command = getEraseHead(addr, 1);
 		ret = mUsb.sendCommand(command, command.length);
 		if (ret == null)
 			return false;
 		ret = recvResult();
 		if (ret == null)
 			return false;
-		
+
 		ComFunc.sleep(20);
 		ret = __writeCalKey(data);
 		if (ret == null)

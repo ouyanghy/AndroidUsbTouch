@@ -5,6 +5,7 @@ import com.ou.base.Function;
 import com.ou.common.ComFunc;
 import com.ou.common.Constant;
 import com.ou.thread.DetectUsbThread;
+import com.ou.thread.UpgradeThread;
 import com.ou.usbtp.R;
 
 import android.app.Activity;
@@ -30,6 +31,8 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 	boolean bAttach = false;
 	DetectUsbThread mDetectThread;
 	DemoActivity mApp;
+	boolean bNormalMode = false;
+	UpgradeThread mUpdateThread;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -56,16 +59,11 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 		mTv.setOnClickListener(this);
 		mHandler = new UIMessageHandler();
 		mTv.setText(ComFunc.getString(this, R.string.device_no_found));
-		mDetectThread = new DetectUsbThread(getApplicationContext());
+		mDetectThread = new DetectUsbThread(getApplicationContext(),this);
 		mDetectThread.start();
 		ComFunc.log("demo onCreate");
 		
 	}
-
-	
-/*	private void sendMessage(int what) {
-		mHandler.obtainMessage(what, getApplicationContext());
-	}*/
 
 	@Override
 	protected void onDestroy() {
@@ -79,21 +77,23 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 		// TODO Auto-generated method stub
 		int id = v.getId();
 		boolean r  = false;
+		r = DetectUsbThread.isUsbEnable();
+		if (r == false) {
+			mTv.setText(ComFunc.getString(getApplicationContext(), R.string.device_no_open) + "\n");
+			return;
+		}
+		
 		switch (id) {
+		/*
 		case R.id.buttonOpen:
-
-
 			break;
 		case R.id.buttonClose:
 				;
-				break;
+				break;*/
 		case R.id.buttonId:
-			r = DetectUsbThread.isUsbEnable();
-			if (r == false) {
-				mTv.append(ComFunc.getString(getApplicationContext(), R.string.device_no_open) + "\n");
-				break;
-			}
-
+			if (!bNormalMode)
+				return;
+			
 			mFunc = DetectUsbThread.getUsbFunction();
 			String s = mFunc.getFramewareId();
 			if (s == null) {
@@ -104,11 +104,8 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 
 			break;
 		case R.id.buttonSetting:
-			r = DetectUsbThread.isUsbEnable();
-			if (r == false) {
-				mTv.append(ComFunc.getString(getApplicationContext(), R.string.device_no_open) + "\n");
-				break;
-			}
+			if (!bNormalMode)
+				return;
 			
 			mFunc = DetectUsbThread.getUsbFunction();
 			SettingDialog d = new SettingDialog(this, mFunc);
@@ -117,11 +114,8 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 			break;
 
 		case R.id.buttonHardwareTest:
-			r = DetectUsbThread.isUsbEnable();
-			if (r == false) {
-				mTv.append(ComFunc.getString(getApplicationContext(), R.string.device_no_open) + "\n");
-				break;
-			}
+			if (!bNormalMode)
+				return;
 			
 			mFunc = DetectUsbThread.getUsbFunction();
 			byte[] bs = mFunc.readBroadInfo().getBuffer();
@@ -135,29 +129,21 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 			
 			break;
 		case R.id.buttonKeyset:
+			if (!bNormalMode)
+				return;
+			
 			startActivity(new Intent(this, ShortCutActivity.class));
 			break;
 			
 		case R.id.buttonCal:
-			r = DetectUsbThread.isUsbEnable();
-			if (r == false) {
-				mTv.append(ComFunc.getString(getApplicationContext(), R.string.device_no_open) + "\n");
-				break;
-			}
+			if (!bNormalMode)
+				return;
 			
 			startActivity(new Intent(mApp, CalActivity.class));
 			break;
 			
 		case R.id.buttonUpgrde:
-			r = DetectUsbThread.isUsbEnable();
-			if (r == false) {
-				mTv.append(ComFunc.getString(getApplicationContext(), R.string.device_no_open) + "\n");
-				break;
-			}
-
-			
 			startSelectFile();
-			
 			break;
 			
 		case R.id.tv:
@@ -176,9 +162,11 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 
 			@Override
 			public void onClick(DialogInterface dialog, int which) {
+				dialog.dismiss();
 				// TODO Auto-generated method stub
-				mFunc = DetectUsbThread.getUsbFunction();
-				ProgressDialog d = new ProgressDialog(mApp, mFunc, data);
+				mUpdateThread = new UpgradeThread(mApp, data);
+				mUpdateThread.start();
+				ProgressDialog d = new ProgressDialog(mApp,mUpdateThread, data);
 				d.show();
 			}
 			
@@ -200,16 +188,8 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 		 return true;
 	}
 	public void startSelectFile() {
-		Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-		intent.setType("*/*");
-		intent.addCategory(Intent.CATEGORY_OPENABLE);
-		
-
-		try {
-			startActivityForResult(Intent.createChooser(intent, "Select a File to Upload"),FILE_SELECT_CODE);
-		} catch (android.content.ActivityNotFoundException ex) {
-
-		}
+		Intent i = new Intent(this, FileSelectorActivity.class);
+		startActivityForResult(i, FILE_SELECT_CODE);
 	}
 		
 	@Override
@@ -226,14 +206,26 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 			super.onActivityResult(requestCode, resultCode, data);
 	}
 
-
+	
 	@Override
 	public void call() {
 		// TODO Auto-generated method stub
 		
 		if (DetectUsbThread.isUsbEnable()) {
-			mFunc = Function.getTpUsbFunction();	
+			if (mUpdateThread != null && mUpdateThread.getWorkState() == false) {
+				mTv.setText(ComFunc.getString(mApp, R.string.bad_mode));
+				return;
+			}
+			
+			mFunc = Function.getTpUsbFunction();
 			mTv.setText(mFunc.getShortDesc(this));
+			int pid = mFunc.getPid();
+			if (pid != Constant.PID_NORMAL) {
+				bNormalMode = false;
+			}
+			else {
+				bNormalMode = true;
+			}
 		}
 		else {
 			mTv.setText(ComFunc.getString(this, R.string.device_no_found));

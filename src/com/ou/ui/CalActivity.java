@@ -131,7 +131,8 @@ public class CalActivity extends Activity implements OnClickListener {
 
 	@Override
 	protected void onDestroy() {
-
+		if (mWorker != null)
+			mWorker.release();
 		super.onDestroy();
 	}
 
@@ -160,7 +161,6 @@ public class CalActivity extends Activity implements OnClickListener {
 			if (bTouchUp == false)
 				return super.onTouchEvent(event);
 			
-			mWorker = new CalPointThread(mHandler);
 			mWorker.start();
 			bTouchUp = false;
 			ComFunc.log("ouyang touch up start cal thread");
@@ -207,7 +207,7 @@ public class CalActivity extends Activity implements OnClickListener {
 		if (DetectUsbThread.isUsbEnable())
 			return false;
 		boolean r;
-		Function func = Function.getTpUsbFunction();
+		Function func = DetectUsbThread.getUsbFunction();
 		CalInfo cal = func.readCalInfo();
 		if (cal == null)
 			return false;

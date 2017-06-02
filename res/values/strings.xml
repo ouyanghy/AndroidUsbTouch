@@ -6,8 +6,8 @@
     <string name="button_id">版本号</string>
     <string name="button_setting">设置</string>
     <string name="button_hardware">硬件检测</string>
-    <string name="button_upgrade">固件升级</string>
-    <string name="button_checksum">校验</string>
+    <string name="button_upgrade">更新固件</string>
+    <string name="button_checksum">校准</string>
     
     <string name="setting_screen_info">屏幕尺寸</string>
     <string name="setting_screen_mode">屏幕尺寸</string>
@@ -107,5 +107,13 @@
     <string name="shortcut_right">\t→\t</string>
     <string name="shortcut_m">OK\t</string>
   
-
+  <string name="signal_left">左</string>
+  <string name="signal_right">右</string>
+  <string name="signal_x">X</string>
+  <string name="signal_y">Y</string>
+    <string name="signal_low_threshold">低于阈值</string>
+    <string name="signal_pass">PASS</string>
+    <string name="signal_unpass">FAIL</string>
+    
+      <string name="bad_mode">固件版本错误,请升级固件</string>
 </resources>

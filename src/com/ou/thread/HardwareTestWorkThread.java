@@ -22,16 +22,18 @@ public class HardwareTestWorkThread extends Thread {
 		mHandler = handler;
 		mFunc = DetectUsbThread.getUsbFunction();
 		if (mFunc == null)
-			;// send error
+			bWork = false;
 
 		mBoardConfig = conf;
 	}
 
 	private HardwareSignal fillAllSignal() {
+		mFunc = DetectUsbThread.getUsbFunction();
 		HardwareSignal signal = new HardwareSignal(mBoardConfig);
 		for (int dir = 0; dir < Constant.LED_EMIT_DIRECTION_TOTAL_NUM; dir++) {
 			byte [] bs = mFunc.readImage(dir, mBoardConfig.getTotalLedNumber());
-
+			if (bs == null)
+				return null;
 			signal.setXLedSignal(dir, bs,true);
 			signal.setYLedSignal(dir, bs,true);
 		}
@@ -44,7 +46,16 @@ public class HardwareTestWorkThread extends Thread {
 	@Override
 	public void run() {
 		while (bWork) {
+			if (DetectUsbThread.isUsbEnable() == false) {
+				bWork = false;
+				break;
+			}
 			HardwareSignal sig= fillAllSignal();
+			if (sig == null) {
+				ComFunc.sleep(1);
+				continue;
+			}
+			
 			sendImage(sig);
 			ComFunc.sleep(1);
 		}

@@ -19,6 +19,10 @@ public class CalPointThread extends Thread {
 		}
 		
 	}
+	
+	public void release() {
+		bWork = false;
+	}
 
 	@Override
 	public void run() {
@@ -49,7 +53,7 @@ public class CalPointThread extends Thread {
 			bWork = false;
 			return;
 		}
-		mFunc = Function.getTpUsbFunction();
+		mFunc = DetectUsbThread.getUsbFunction();
 		mHandler = handler;
 		mLock = new Object();
 	}

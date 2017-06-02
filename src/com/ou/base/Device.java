@@ -19,21 +19,19 @@ import android.util.Log;
 public class Device {
 	private Context mContext;
 	private UsbManager mManager;
-	private UsbDevice mUsb;
-	private UsbDeviceConnection mUsbConnect;
-	private UsbEndpoint mUsbInPoint, mUsbOutPoint, mUsbIntPoint;
-	private UsbInterface mUsbIntf;
+	private UsbDevice mDevice;
+	private UsbDeviceConnection mDeviceConnect;
+	private UsbEndpoint mDeviceInPoint, mDeviceOutPoint, mDeviceIntPoint;
+	private UsbInterface mDeviceIntf;
 	private int mInterface;
-	private final int VID = 0x0AC8;
 	
-	private final int PID_NORMAL = 0xCB0B;
 
 	
 	public Device(Context c) {
 		mContext = c;
 		mManager = (UsbManager) c.getSystemService(Context.USB_SERVICE);
-		mUsb = findDevice();
-		if (mUsb == null)
+		mDevice = findDevice();
+		if (mDevice == null)
 			return;
 		checkUsbPermission();
 		
@@ -41,14 +39,14 @@ public class Device {
 	}
 
 	public boolean isAvail() {
-		if (mUsb == null)
+		if (mDevice == null)
 			return false;
 
 		return true;
 	}
 	
 	public boolean isBootDevice() {
-		if (mUsb.getProductId() == PID_NORMAL) {
+		if (mDevice.getProductId() == Constant.PID_NORMAL) {
 			return false;
 		}
 		
@@ -58,52 +56,52 @@ public class Device {
 	protected static final String TAG = "OUsbDevice";
 
 	/*
-	 * private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
+	 * private final BroadcastReceiver mDeviceReceiver = new BroadcastReceiver() {
 	 * public void onReceive(Context context, Intent intent) { String action =
 	 * intent.getAction(); Log.i(TAG, "action:" + action); // getDeviceList(); }
 	 * };
 	 */
 
 	public boolean open() {
-		if (mUsb == null) {
+		if (mDevice == null) {
 			Log.e(TAG, "usb device is null");
 			return false;
 		}
 		
 
-		Log.i(TAG, "usb get interface count:" + mUsb.getInterfaceCount());
-		mUsbIntf = mUsb.getInterface(0);
-		if (mUsbIntf == null) {
-			Log.e(TAG, "usb mUsbIntf is null");
+		Log.i(TAG, "usb get interface count:" + mDevice.getInterfaceCount());
+		mDeviceIntf = mDevice.getInterface(0);
+		if (mDeviceIntf == null) {
+			Log.e(TAG, "usb mDeviceIntf is null");
 			return false;
 		}
 		
-	/*	  mUsbInPoint = mUsbIntf.getEndpoint(0); mUsbOutPoint =
-		 mUsbIntf.getEndpoint(1);
+	/*	  mDeviceInPoint = mDeviceIntf.getEndpoint(0); mDeviceOutPoint =
+		 mDeviceIntf.getEndpoint(1);
 		 */
-		// Log.i(TAG, "usb point count:" + mUsbIntf.getEndpointCount());
+		// Log.i(TAG, "usb point count:" + mDeviceIntf.getEndpointCount());
 
-		for (int t = 0; t < mUsb.getInterfaceCount(); t++) {
-			mUsbIntf = mUsb.getInterface(t);
-			Log.i(TAG, "usb point count:" + mUsbIntf.getEndpointCount() + " interface:" + t);
+		for (int t = 0; t < mDevice.getInterfaceCount(); t++) {
+			mDeviceIntf = mDevice.getInterface(t);
+			Log.i(TAG, "usb point count:" + mDeviceIntf.getEndpointCount() + " interface:" + t);
 
-			for (int i = 0; i < mUsbIntf.getEndpointCount(); i++) {
+			for (int i = 0; i < mDeviceIntf.getEndpointCount(); i++) {
 
-				int type = mUsbIntf.getEndpoint(i).getType();
+				int type = mDeviceIntf.getEndpoint(i).getType();
 				Log.i(TAG, "usb end point type:" + type);
 
 				switch (type) {
 				case UsbConstants.USB_ENDPOINT_XFER_BULK: {
-					if (mUsbIntf.getEndpoint(i).getDirection() == UsbConstants.USB_DIR_IN) {
-						mUsbInPoint = mUsbIntf.getEndpoint(i);
-					} else if (mUsbIntf.getEndpoint(i).getDirection() == UsbConstants.USB_DIR_OUT) {
-						mUsbOutPoint = mUsbIntf.getEndpoint(i);
+					if (mDeviceIntf.getEndpoint(i).getDirection() == UsbConstants.USB_DIR_IN) {
+						mDeviceInPoint = mDeviceIntf.getEndpoint(i);
+					} else if (mDeviceIntf.getEndpoint(i).getDirection() == UsbConstants.USB_DIR_OUT) {
+						mDeviceOutPoint = mDeviceIntf.getEndpoint(i);
 					}
 					break;
 				}
 
 				case UsbConstants.USB_ENDPOINT_XFER_INT:
-					mUsbIntPoint = mUsbIntf.getEndpoint(i);
+					mDeviceIntPoint = mDeviceIntf.getEndpoint(i);
 					break;
 
 				case UsbConstants.USB_ENDPOINT_XFER_CONTROL: {
@@ -115,18 +113,18 @@ public class Device {
 
 		}
 
-		Log.i(TAG, "usb in point:" + mUsbInPoint);
-		Log.i(TAG, "usb out point:" + mUsbOutPoint);
-		Log.i(TAG, "usb int point:" + mUsbIntPoint);
-		Log.i(TAG, "usb type:" + mUsbIntf.getEndpoint(0).getType());
+		Log.i(TAG, "usb in point:" + mDeviceInPoint);
+		Log.i(TAG, "usb out point:" + mDeviceOutPoint);
+		Log.i(TAG, "usb int point:" + mDeviceIntPoint);
+		Log.i(TAG, "usb type:" + mDeviceIntf.getEndpoint(0).getType());
 		// return false;
 
-		mUsbConnect = mManager.openDevice(mUsb);
-		if (mUsbConnect == null) {
+		mDeviceConnect = mManager.openDevice(mDevice);
+		if (mDeviceConnect == null) {
 			Log.e(TAG, "usb connect fail");
 			return false;
 		}
-		boolean ret = mUsbConnect.claimInterface(mUsbIntf, true);
+		boolean ret = mDeviceConnect.claimInterface(mDeviceIntf, true);
 		if (ret == false) {
 			Log.e(TAG, "usb claimInterface fail");
 		} else {
@@ -156,7 +154,7 @@ public class Device {
 			data = buffer;
 	
 	//	Common.log("send:", data, data.length);
-		ret = mUsbConnect.controlTransfer(requestType, request, value, index, data, length, 1000);
+		ret = mDeviceConnect.controlTransfer(requestType, request, value, index, data, length, 1000);
 		if (ret < 0) {
 			ComFunc.log("send ret null,ret:" + ret);
 			return null;
@@ -182,7 +180,7 @@ public class Device {
 		// bs[0] = 6;
 		// bs[1] = 3;
 
-		ret = mUsbConnect.controlTransfer(requestType, request, value, index, bs, length, 1000);
+		ret = mDeviceConnect.controlTransfer(requestType, request, value, index, bs, length, 1000);
 		if (ret < 0) {
 			ComFunc.log("recv ret null");
 			return null;
@@ -195,8 +193,8 @@ public class Device {
 
 	
 	public String getDescrption() {
-		String s = "product id:" + String.format("%x", mUsb.getProductId()) + "\n";
-		s += ("vendor id:" + String.format("%x",mUsb.getVendorId()) + "\ns");
+		String s = "product id:" + String.format("%x", mDevice.getProductId()) + "\n";
+		s += ("vendor id:" + String.format("%x",mDevice.getVendorId()) + "\ns");
 
 		final int STD_USB_REQUEST_GET_DESCRIPTOR = 0x06;
 		final int LIBUSB_DT_STRING = 0x03;
@@ -207,9 +205,9 @@ public class Device {
 		String stringManufacturer = "";
 		String stringProduct = "";
 
-		byte[] rawDescriptors = mUsbConnect.getRawDescriptors();
+		byte[] rawDescriptors = mDeviceConnect.getRawDescriptors();
 
-		int ret = mUsbConnect.controlTransfer(UsbConstants.USB_DIR_IN | UsbConstants.USB_TYPE_STANDARD,
+		int ret = mDeviceConnect.controlTransfer(UsbConstants.USB_DIR_IN | UsbConstants.USB_TYPE_STANDARD,
 				STD_USB_REQUEST_GET_DESCRIPTOR, (LIBUSB_DT_STRING << 8) | rawDescriptors[indexManufacturer], // value
 				0, // index
 				buffer, // buffer
@@ -222,7 +220,7 @@ public class Device {
 		//Common.sleep(10);
 		//recvResult();
 
-		ret = mUsbConnect.controlTransfer(UsbConstants.USB_DIR_IN | UsbConstants.USB_TYPE_STANDARD,
+		ret = mDeviceConnect.controlTransfer(UsbConstants.USB_DIR_IN | UsbConstants.USB_TYPE_STANDARD,
 				STD_USB_REQUEST_GET_DESCRIPTOR, (LIBUSB_DT_STRING << 8) | rawDescriptors[indexProduct], 0, buffer, 0xFF,
 				0);
 
@@ -237,15 +235,15 @@ public class Device {
 
 	public String  getShortDesc() {
 		String s = "";
-		s += "PID:" + String.format("%04X", mUsb.getProductId()) + "\n";
-		s += "VID:" + String.format("%04X", mUsb.getVendorId()) + "\n";
+		s += "PID:" + String.format("%04X", mDevice.getProductId()) + "\n";
+		s += "VID:" + String.format("%04X", mDevice.getVendorId()) + "\n";
 		return s;
 	}
 
 	public void close() {
-		if (mUsb != null && mUsbConnect != null) {
-			mUsbConnect.releaseInterface(mUsbIntf);
-			mUsbConnect.close();
+		if (mDevice != null && mDeviceConnect != null) {
+			mDeviceConnect.releaseInterface(mDeviceIntf);
+			mDeviceConnect.close();
 		}
 		
 	}
@@ -257,9 +255,9 @@ public class Device {
 			Log.i(TAG, "usb get devices:" + usb.getProductId() + " " + usb.getVendorId());
 			int pid = usb.getProductId();
 			int vid = usb.getVendorId();
-			if (vid == VID) {
+			if (vid == Constant.VID) {
 				
-				if (pid == PID_NORMAL)
+				if (pid == Constant.PID_NORMAL)
 					mInterface = Constant.DEVICE_INTERFACE_NORMAL;
 				else 
 					mInterface = Constant.DEVICE_INTEFFACE_BOOT;
@@ -274,18 +272,18 @@ public class Device {
 	}
 
 	public int getPid() {
-		return mUsb.getProductId();
+		return mDevice.getProductId();
 	}
 	
 	public int getVid() {
-		return mUsb.getVendorId();
+		return mDevice.getVendorId();
 	}
 	
 
 	public boolean checkUsbPermission() {
 		
 
-		if (mManager.hasPermission(mUsb)) {
+		if (mManager.hasPermission(mDevice)) {
 			Log.i(TAG, "check usb has permission already");
 			return true;
 		} else {
@@ -298,7 +296,7 @@ public class Device {
 	
 	public void requestPermission() {
 		PendingIntent mPermissionIntent = PendingIntent.getBroadcast(mContext, 0, new Intent(Constant.ACTION_USB_PERMISSION), 0);
-		mManager.requestPermission(mUsb, mPermissionIntent);
+		mManager.requestPermission(mDevice, mPermissionIntent);
 	}
 	
 }

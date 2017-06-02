@@ -1,10 +1,10 @@
-package com.ou.base;
+package com.ou.thread;
 
 import java.io.File;
 
+import com.ou.base.Function;
 import com.ou.common.ComFunc;
 import com.ou.common.Constant;
-import com.ou.thread.DetectUsbThread;
 import com.ou.ui.UIMessageHandler;
 
 import android.content.Context;
@@ -17,7 +17,7 @@ public class UpgradeThread extends Thread {
 	Function mFunc;
 	Intent mData;
 	boolean bWorkState = false;
-
+	
 	private void sendMessage(int what) {
 		mHandler.obtainMessage(what, mContext).sendToTarget();
 	}
@@ -57,6 +57,7 @@ public class UpgradeThread extends Thread {
 			return;
 		}
 
+		
 		File f = new File(path);
 		if (f.exists() == false || f.canRead() == false) {
 			sendMessage(Constant.MSG_FILE_INVAILD);
@@ -64,7 +65,7 @@ public class UpgradeThread extends Thread {
 			return;
 		}
 
-		
+		ComFunc.log("open file:" + path);
 		r = mFunc.prepareUpgrade();
 		if (r) {
 			ComFunc.sleep(2000);
@@ -98,9 +99,9 @@ public class UpgradeThread extends Thread {
 		bWorkState = false;
 	}
 
-	public UpgradeThread(Context context, Intent data, Function func) {
+	public UpgradeThread(Context context, Intent data) {
 		mData = data;
-		mFunc = func;
+		mFunc = DetectUsbThread.getUsbFunction();
 		mContext = context;
 		mHandler = new UIMessageHandler();
 	}

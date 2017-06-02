@@ -7,6 +7,7 @@ import com.ou.base.ShortCutReport;
 import com.ou.common.ComFunc;
 import com.ou.common.Constant;
 import com.ou.thread.CalPointThread;
+import com.ou.thread.DetectUsbThread;
 import com.ou.usbtp.R;
 import com.ou.view.ShortCutView;
 
@@ -42,6 +43,12 @@ public class ShortCutActivity extends Activity implements OnClickListener,KeyCnt
 	ShortCutReport mReport;
 	ShortCutActivity mApp;
 	CalPointThread mPointThread;
+	
+	@Override
+	protected void onDestroy() {
+		mPointThread.release();
+		super.onDestroy();
+	}
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -77,7 +84,7 @@ public class ShortCutActivity extends Activity implements OnClickListener,KeyCnt
 	}
 	
 	PointF getCalPoint() {
-		Function func = Function.getTpUsbFunction();
+		Function func = DetectUsbThread.getUsbFunction();
 		return func.readCalPoint();
 	}
 	@Override
@@ -148,7 +155,7 @@ public class ShortCutActivity extends Activity implements OnClickListener,KeyCnt
 			
 			
 			mPointCnt++;*/
-			mPointThread = new CalPointThread(mPointHandler);
+			
 			bTouchUp = false;
 			return super.onTouchEvent(event);
 		}
@@ -184,7 +191,7 @@ public class ShortCutActivity extends Activity implements OnClickListener,KeyCnt
 	}
 
 	boolean writeToIc() {
-		Function mFunc = Function.getTpUsbFunction();
+		Function mFunc  = DetectUsbThread.getUsbFunction();
 		byte [] data = mReport.toBytes();
 		if (data == null) {
 			return false;

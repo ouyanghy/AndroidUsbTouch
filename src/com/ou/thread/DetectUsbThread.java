@@ -1,12 +1,11 @@
 package com.ou.thread;
 
+
 import com.ou.base.CallBack;
 import com.ou.base.Device;
 import com.ou.base.Function;
-import com.ou.base.ShortCutPointGroup;
 import com.ou.common.ComFunc;
 import com.ou.common.Constant;
-import com.ou.ui.UIMessageHandler;
 import com.ou.usbtp.R;
 
 import android.content.BroadcastReceiver;
@@ -14,10 +13,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
-import android.util.SparseArray;
 
 public class DetectUsbThread extends Thread {
-	private UIMessageHandler mHandler;
 	private Device mUsb;
 	private static Function mFunc;
 	private Context mContext;
@@ -27,31 +24,12 @@ public class DetectUsbThread extends Thread {
 	private Object mLock;
 	private boolean bNeedRequestPermission = true;
 	private int requestCount = 0;
-
+	private CallBack mCall;
 	private boolean bFirst = true;
-	SparseArray <CallBack> mCallMap ;
-	int mCallId = 0;
-	public void addCall( CallBack call) {
-		mCallId++;
-		mCallMap.put(mCallId, call);
-	}
-	
-	public void deleteCall(CallBack call) {
-		for (int i = 0; i < mCallMap.size(); i++) {
-			CallBack c = mCallMap.valueAt(i);
-			if (c == call) {
-				int key = mCallMap.keyAt(i);
-				mCallMap.delete(key);
-				break;
-			}
-		}
-		
-	}
-	public DetectUsbThread(Context context) {
-		mHandler = new UIMessageHandler();
+	public DetectUsbThread(Context context, CallBack call) {
 		mContext = context;
 		mLock = new Object();
-		mCallMap = new SparseArray<CallBack>();
+		mCall = call;
 		IntentFilter filter = new IntentFilter();
 		filter.addAction(Constant.ACTION_USB_PERMISSION);
 		filter.addAction(Constant.FIRST_BLOOD);
@@ -85,10 +63,10 @@ public class DetectUsbThread extends Thread {
 
 	private void work() {
 		if (bOpen == true) {
-		//	Common.log("already open" );
+		//	ComFunc.log("already open" );
 			return;
 		}else {
-			//Common.log("want to open" );
+			//ComFunc.log("want to open" );
 		}
 		
 		synchronized (mLock) {
@@ -114,11 +92,11 @@ public class DetectUsbThread extends Thread {
 
 		// mTv.setText("≥ı ºªØ\n");
 		if (mUsb.isAvail() == false) {
-			sendMessage(R.string.device_no_found);
-			//Common.log("device is invalid");
+			ComFunc.sendMessage(R.string.device_no_found, mContext);
+			//ComFunc.log("device is invalid");
 			return;
 		} else
-			sendMessage(R.string.device_found);
+			ComFunc.sendMessage(R.string.device_found, mContext);
 
 		boolean has_permission = mUsb.checkUsbPermission();
 		if (has_permission) {	
@@ -128,18 +106,18 @@ public class DetectUsbThread extends Thread {
 			if (boot_mode) {
 				if (bOpen) {
 					mFunc = new Function(mUsb);
-					//sendMessage(Enums.MSG_OPEN_DEVICE_BOOT_MODE_SUCC);
+					//sendMessage(Constant.MSG_OPEN_DEVICE_BOOT_MODE_SUCC);
 					if (bFirst) {
 						bFirst = false;
 						mContext.sendBroadcast(new Intent(Constant.FIRST_BLOOD));
 					}
 				}
 				else {
-					sendMessage(Constant.MSG_OPEN_DEVICE_BOOT_MODE_ERR);
+					ComFunc.sendMessage(Constant.MSG_OPEN_DEVICE_BOOT_MODE_ERR, mContext);
 				}
 			} else {
 				if (bOpen) {
-					//sendMessage(Enums.MSG_OPEN_DEVICE_NORMAL_MODE_SUCC);
+					//sendMessage(Constant.MSG_OPEN_DEVICE_NORMAL_MODE_SUCC);
 					mFunc = new Function(mUsb);
 					if (bFirst) {
 						bFirst = false;
@@ -147,14 +125,14 @@ public class DetectUsbThread extends Thread {
 					}
 				}
 				else
-					sendMessage(Constant.MSG_OPEN_DEVICE_NORMAL_MODE_ERR);
+					ComFunc.sendMessage(Constant.MSG_OPEN_DEVICE_NORMAL_MODE_ERR, mContext);
 			}
-			//sendMessage(Enums.MSG_REQUEST_USB_PERMISSION_SUCC);
+			//sendMessage(Constant.MSG_REQUEST_USB_PERMISSION_SUCC);
 		} else {
 			ComFunc.log("enter request");
 			if (bNeedRequestPermission) {
 				ComFunc.log("request permission now ");
-				sendMessage(Constant.MSG_NEED_USB_PERMISSION);
+				ComFunc.sendMessage(Constant.MSG_NEED_USB_PERMISSION,mContext);
 				mUsb.requestPermission();
 			}
 			
@@ -166,10 +144,6 @@ public class DetectUsbThread extends Thread {
 				
 			}
 		}
-	}
-
-	private void sendMessage(int what) {
-		mHandler.obtainMessage(what, mContext).sendToTarget();
 	}
 
 	private void deviceDeinit(boolean is_exit_safe) {
@@ -184,12 +158,6 @@ public class DetectUsbThread extends Thread {
 		bOpen = false;
 	}
 
-	void call() {
-		for (int i = 0; i < mCallMap.size(); i++) {
-			CallBack c = mCallMap.valueAt(i);
-			c.call();
-		}
-	}
 	private final BroadcastReceiver mUsbReceiver = new BroadcastReceiver() {
 
 		public void onReceive(Context context, Intent intent) {
@@ -216,17 +184,24 @@ public class DetectUsbThread extends Thread {
 
 				ComFunc.log(UsbManager.ACTION_USB_DEVICE_ATTACHED);
 				ComFunc.log("set permission 1:" + bNeedRequestPermission);
-				call();
+				if (mCall != null) {
+					ComFunc.sleep(500);
+					mCall.call();
+				}
 			} else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
 				bNeedRequestPermission = true;
 				deviceDeinit(false);
 				ComFunc.log(UsbManager.ACTION_USB_DEVICE_DETACHED);
-				call();
+				if (mCall != null)
+					mCall.call();
 			
 			} else if (Constant.FIRST_BLOOD.equals(action)){
-				call();
+				if (mCall != null) {
+					mCall.call();
+				}
 			}
 		}
 	};
 
 }
+

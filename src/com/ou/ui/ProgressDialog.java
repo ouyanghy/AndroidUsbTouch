@@ -1,10 +1,10 @@
 package com.ou.ui;
 
 import com.ou.base.Function;
-import com.ou.base.UpgradeThread;
 import com.ou.common.ComFunc;
 import com.ou.common.Constant;
 import com.ou.thread.DetectUsbThread;
+import com.ou.thread.UpgradeThread;
 import com.ou.usbtp.R;
 import com.ou.view.ProgressView;
 
@@ -26,7 +26,7 @@ public class ProgressDialog extends Dialog {
 	public static final int PROGRESS_UPDATE = 1;
 	public static final int PROGRESS_FINISH = 2;
 
-	public ProgressDialog(Context context, Function func, Intent data) {
+	public ProgressDialog(Context context, UpgradeThread update, Intent data) {
 		super(context);
 		setContentView(R.layout.progress_dialog);
 		WindowManager.LayoutParams lp = getWindow().getAttributes();
@@ -35,9 +35,7 @@ public class ProgressDialog extends Dialog {
 		getWindow().addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND);
 
 		mV = (ProgressView) findViewById(R.id.progressView);
-
-		mWorkThread = new UpgradeThread(context, data, func);
-		mWorkThread.start();
+		mWorkThread = update;
 		listenPercent();
 		setCancelable(false);
 	}

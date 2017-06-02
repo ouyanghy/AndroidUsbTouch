@@ -1,6 +1,9 @@
 package com.ou.common;
 
 public class Constant {	
+	public static final int VID = 0x0AC8;
+	
+	public static final int PID_NORMAL = 0xCB0B;
 	public static final int REPORT_ID_OUT_CMD = 0x5;
 
 	public static final int CMD_SET_MODE = 0x3;
