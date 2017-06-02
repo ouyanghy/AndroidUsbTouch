@@ -96,6 +96,13 @@ public class UpgradeThread extends Thread {
 			//sendMessage(Enums.MSG_UPGRADE_SUCC);
 		}
 		ComFunc.log("path:" + path);
+		
+		int cnt = 0;
+		do {
+			r = DetectUsbThread.isUsbEnable();
+			ComFunc.sleep(10);
+			ComFunc.log("update thread wait usb enable:" + mFunc.getPid());
+		} while (r == false && cnt++ < 600);
 		bWorkState = false;
 	}
 

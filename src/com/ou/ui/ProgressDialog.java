@@ -67,13 +67,14 @@ public class ProgressDialog extends Dialog {
 					else if (mPercent <= Constant.PROGRESS_ERR) {
 						mCurPercent-= 2;
 					}
+					else if (mPercent >= Constant.PROGRESS_FLASH_FINISH) {
+						mCurPercent+=4;
+					}
+					else if (mPercent < Constant.PROGRESS_FLASH_FINISH
+							&& mCurPercent < Constant.PROGRESS_FLASH_FINISH) {
+						mCurPercent++;
+					} 
 					
-					else if (mPercent <= Constant.PROGRESS_FLASH_FINISH
-							&& mCurPercent <= Constant.PROGRESS_FLASH_FINISH) {
-						mCurPercent++;
-					}  else if (mCurPercent <= (Constant.PROGRESS_FINISH - 2)) {
-						mCurPercent++;
-					}  
 
 					if (mPercent == Constant.PROGRESS_READ_FILE)
 						mNote = ComFunc.getString(getContext(), R.string.upgrade_check_file);
@@ -86,7 +87,7 @@ public class ProgressDialog extends Dialog {
 					else if (mPercent == Constant.PROGRESS_SWITCH_BOOT)
 						mNote = ComFunc.getString(getContext(), R.string.upgrade_switch_boot);
 
-					float t = Math.abs(mPercent - mCurPercent) / 100;
+					float t = (float)Math.abs(mPercent - mCurPercent) / 100;
 					mSleep = (long) (Math.abs(1 - 4 * t) * 400);
 					mHandler.obtainMessage(PROGRESS_UPDATE).sendToTarget();
 					ComFunc.sleep(mSleep);
@@ -107,6 +108,7 @@ public class ProgressDialog extends Dialog {
 						do {
 							r = DetectUsbThread.isUsbEnable();
 							ComFunc.sleep(20);
+							ComFunc.log("wait usb enable:" + cnt);
 						} while (r == false && cnt++ < 1000);
 						
 						if (cnt >= 1000) {

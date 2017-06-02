@@ -212,16 +212,17 @@ public class DemoActivity extends Activity implements OnClickListener,CallBack {
 		// TODO Auto-generated method stub
 		
 		if (DetectUsbThread.isUsbEnable()) {
-			if (mUpdateThread != null && mUpdateThread.getWorkState() == false) {
-				mTv.setText(ComFunc.getString(mApp, R.string.bad_mode));
-				return;
-			}
 			
 			mFunc = Function.getTpUsbFunction();
 			mTv.setText(mFunc.getShortDesc(this));
 			int pid = mFunc.getPid();
 			if (pid != Constant.PID_NORMAL) {
 				bNormalMode = false;
+				if (mUpdateThread != null && mUpdateThread.getWorkState() == false) {
+					mTv.setText(ComFunc.getString(mApp, R.string.bad_mode));
+					return;
+				}
+				
 			}
 			else {
 				bNormalMode = true;

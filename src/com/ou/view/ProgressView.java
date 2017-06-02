@@ -17,12 +17,13 @@ public class ProgressView extends View {
 	Point mMiddle;
 	int mPercent = 0;
 	float mFontSize;
-	String mNote="";
+	String mNote = "";
+
 	private void init() {
 		mPaint = new Paint();
 		mPaint.setColor(Color.GREEN);
 		mMiddle = new Point();
-	
+
 		ComFunc.log("(" + getWidth() + "," + getHeight() + ")");
 
 	}
@@ -48,10 +49,11 @@ public class ProgressView extends View {
 	public void setNote(String note) {
 		mNote = note;
 	}
+
 	public void setPercent(int percent) {
 		if (percent > 100)
 			percent = 100;
-		
+
 		if (percent < 0)
 			percent = 0;
 		mPercent = percent;
@@ -68,21 +70,20 @@ public class ProgressView extends View {
 			int cir;
 			int w = getWidth();
 			int h = getHeight();
-			mMiddle.x = w /2;
-			mMiddle.y = h/2;
+			mMiddle.x = w / 2;
+			mMiddle.y = h / 2;
 			if (w > h) {
-				cir = h * 4/5;
+				cir = h * 4 / 5;
 				left = mMiddle.x - cir / 2;
 				right = left + cir;
-				top = mMiddle.y - cir/2;
+				top = mMiddle.y - cir / 2;
 				bottom = top + cir;
 
-
 			} else {
-				cir = w * 4/5;
-				left = mMiddle.x - cir/ 2;
+				cir = w * 4 / 5;
+				left = mMiddle.x - cir / 2;
 				right = left + cir;
-				top = mMiddle.y - cir/2;
+				top = mMiddle.y - cir / 2;
 				bottom = top + cir;
 
 			}
@@ -95,17 +96,17 @@ public class ProgressView extends View {
 		canvas.drawArc(mRect, 0, 360, true, mPaint);
 
 		mPaint.setColor(Color.YELLOW);
-		float deg = ((float)mPercent/100) * 360;
+		float deg = ((float) mPercent / 100) * 360;
 		canvas.drawArc(mRect, 0, deg, true, mPaint);
 
 		mPaint.setColor(Color.RED);
 
-			float size = mPaint.getTextSize();
-			canvas.drawText(mPercent + "%", mMiddle.x - size /2, mMiddle.y + size/2, mPaint);
-			
-			mPaint.setColor(Color.WHITE);
-			canvas.drawText(mNote, size + 2, size + 2, mPaint);
+		float size = mPaint.getTextSize();
+		canvas.drawText(mPercent + "%", mMiddle.x - size / 2, mMiddle.y + size / 2, mPaint);
+
+		mPaint.setColor(Color.WHITE);
+		
+		canvas.drawText(mNote, mMiddle.x - size * mNote.length()/2, size + 2, mPaint);
 	}
-	
 
 }
