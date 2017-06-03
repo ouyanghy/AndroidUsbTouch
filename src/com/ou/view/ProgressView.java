@@ -102,7 +102,8 @@ public class ProgressView extends View {
 		mPaint.setColor(Color.RED);
 
 		float size = mPaint.getTextSize();
-		canvas.drawText(mPercent + "%", mMiddle.x - size / 2, mMiddle.y + size / 2, mPaint);
+		String s = mPercent + "%";
+		canvas.drawText(s, mMiddle.x - size * s.length()/ 2, mMiddle.y + size / 2, mPaint);
 
 		mPaint.setColor(Color.WHITE);
 		

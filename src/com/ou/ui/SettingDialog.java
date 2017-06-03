@@ -151,7 +151,7 @@ public class SettingDialog extends Dialog implements OnClickListener {
 	private void initSetting(int notice_id_succ, int notice_id_fail) {
 		byte ret[] = mFunc.switchMode(Constant.SET_MODE);
 		if (ret == null) {
-			ComFunc.sendMessage(Constant.MSG_SET_MODE_ERR, getContext());
+			//ComFunc.sendMessage(Constant.MSG_SET_MODE_ERR, getContext());
 			return;
 		}
 
@@ -208,7 +208,7 @@ public class SettingDialog extends Dialog implements OnClickListener {
 		ComFunc.sleep(20);
 		r = mFunc.eraseCalInfo();
 		if (r == false) {
-			ComFunc.sendMessage(Constant.MSG_ERASE_CAL_INFO_ERR, getContext());
+			//ComFunc.sendMessage(Constant.MSG_ERASE_CAL_INFO_ERR, getContext());
 			return false;
 		}
 
@@ -227,7 +227,7 @@ public class SettingDialog extends Dialog implements OnClickListener {
 	private boolean updateBroadInfo() {
 		boolean ret = mFunc.eraseBroadInfo();
 		if (ret == false) {
-			ComFunc.sendMessage(Constant.MSG_ERASE_BOARD_INFO_ERR, getContext());
+			//ComFunc.sendMessage(Constant.MSG_ERASE_BOARD_INFO_ERR, getContext());
 			return false;
 		}
 

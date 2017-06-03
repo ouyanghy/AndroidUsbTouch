@@ -32,6 +32,8 @@ public class FileSelectorActivity extends Activity implements OnClickListener {
 		mV = (ListView) findViewById(R.id.listViewFile);
 		mBtn = (Button) findViewById(R.id.buttonFilePath);
 		mBtn.setOnClickListener(this);
+		float s = mBtn.getTextSize();
+		mBtn.setTextSize((float) (s * 1.2));
 		setResult(0, null);
 		loadFile("/");
 	}

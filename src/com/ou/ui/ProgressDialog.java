@@ -1,6 +1,5 @@
 package com.ou.ui;
 
-import com.ou.base.Function;
 import com.ou.common.ComFunc;
 import com.ou.common.Constant;
 import com.ou.thread.DetectUsbThread;
@@ -65,7 +64,7 @@ public class ProgressDialog extends Dialog {
 						}
 					}
 					else if (mPercent <= Constant.PROGRESS_ERR) {
-						mCurPercent-= 2;
+						mCurPercent-= 4;
 					}
 					else if (mPercent >= Constant.PROGRESS_FLASH_FINISH) {
 						mCurPercent+=4;
@@ -75,6 +74,8 @@ public class ProgressDialog extends Dialog {
 						mCurPercent++;
 					} 
 					
+					if (mCurPercent > mPercent)
+						mCurPercent = mPercent;
 
 					if (mPercent == Constant.PROGRESS_READ_FILE)
 						mNote = ComFunc.getString(getContext(), R.string.upgrade_check_file);
@@ -88,7 +89,7 @@ public class ProgressDialog extends Dialog {
 						mNote = ComFunc.getString(getContext(), R.string.upgrade_switch_boot);
 
 					float t = (float)Math.abs(mPercent - mCurPercent) / 100;
-					mSleep = (long) (Math.abs(1 - 4 * t) * 400);
+					mSleep = (long) (Math.abs(1 -  t) * 400);
 					mHandler.obtainMessage(PROGRESS_UPDATE).sendToTarget();
 					ComFunc.sleep(mSleep);
 					sleep_all += mSleep;

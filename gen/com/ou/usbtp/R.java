@@ -103,6 +103,7 @@ public final class R {
     public static final class string {
         public static final int action_settings=0x7f060001;
         public static final int app_name=0x7f060000;
+        public static final int ask_exit=0x7f060062;
         public static final int bad_mode=0x7f060061;
         public static final int button_checksum=0x7f060006;
         public static final int button_hardware=0x7f060004;

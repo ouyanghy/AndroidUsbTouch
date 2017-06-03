@@ -8,11 +8,10 @@
     <string name="button_hardware">硬件检测</string>
     <string name="button_upgrade">更新固件</string>
     <string name="button_checksum">校准</string>
-    
     <string name="setting_screen_info">屏幕尺寸</string>
     <string name="setting_screen_mode">屏幕尺寸</string>
     <string name="setting_clear_cal">清除校验</string>
-     <string name="setting_reset">重置</string>
+    <string name="setting_reset">重置</string>
 
     <string-array name="screen_size">
         <item>67(256*128)</item>
@@ -72,11 +71,10 @@
     <string name="msg_device_attach">接入设备</string>
     <string name="msg_device_detach">拔出设备</string>
     <string name="msg_key_set_finish_index">完成组:</string>
-        <string name="msg_shortcut_bound_err">坐标不合理</string>
+    <string name="msg_shortcut_bound_err">坐标不合理</string>
     <string name="msg_shortcut_write_err">快捷键设定失败</string>
-      <string name="msg_shortcut_should_finish">必须完成一组操作后才可以切换模式</string>
-        <string name="msg_shortcut_write_succ">快捷键设定成功</string>
-    
+    <string name="msg_shortcut_should_finish">必须完成一组操作后才可以切换模式</string>
+    <string name="msg_shortcut_write_succ">快捷键设定成功</string>
     <string name="menu_title_x_all">X-全部</string>
     <string name="menu_title_y_all">Y-全部</string>
     <string name="menu_title_threshold">设置阈值</string>
@@ -100,20 +98,19 @@
     <string name="cal_err">校准失败\n点击退出</string>
     <string name="shortcut_note_example">红色圈为示意,请点击实际快捷键的对应位置,点击方向按钮选择方向,所有操作完成后,点击OK</string>
     <string name="shortcut_note_tip">请用触摸笔垂直点击十字星中心,进行校准</string>
-
     <string name="shortcut_up">\t↑\t</string>
     <string name="shortcut_down">\t↓\t</string>
     <string name="shortcut_left">\t←\t</string>
     <string name="shortcut_right">\t→\t</string>
     <string name="shortcut_m">OK\t</string>
-  
-  <string name="signal_left">左</string>
-  <string name="signal_right">右</string>
-  <string name="signal_x">X</string>
-  <string name="signal_y">Y</string>
+    <string name="signal_left">左</string>
+    <string name="signal_right">右</string>
+    <string name="signal_x">X</string>
+    <string name="signal_y">Y</string>
     <string name="signal_low_threshold">低于阈值</string>
     <string name="signal_pass">PASS</string>
     <string name="signal_unpass">FAIL</string>
-    
-      <string name="bad_mode">固件版本错误,请升级固件</string>
+    <string name="bad_mode">固件版本错误,请升级固件</string>
+    <string name="ask_exit">是否退出应用</string>
+
 </resources>
