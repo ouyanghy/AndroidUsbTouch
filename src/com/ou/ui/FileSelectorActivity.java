@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.ou.common.ComFunc;
+import com.ou.common.Constant;
 import com.ou.usbtp.R;
 
 import android.app.Activity;
@@ -14,12 +16,14 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
-import android.widget.AdapterView.OnItemClickListener;
 
 public class FileSelectorActivity extends Activity implements OnClickListener {
 	private ListView mV;
@@ -28,6 +32,8 @@ public class FileSelectorActivity extends Activity implements OnClickListener {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.file_selector);
 		mV = (ListView) findViewById(R.id.listViewFile);
 		mBtn = (Button) findViewById(R.id.buttonFilePath);
@@ -96,6 +102,7 @@ public class FileSelectorActivity extends Activity implements OnClickListener {
 
 					if (fs[position].canRead() == false) {
 						// send some permission flag
+						ComFunc.sendMessage(Constant.MSG_FILE_NO_PERMISSION, getApplicationContext());
 						return;
 					}
 

@@ -38,7 +38,7 @@ public class Function extends Constant {
 
 	public String getShortDesc(Context context) {
 		if (getTpUsbFunction() == null)
-			return ComFunc.getString(context, R.string.device_no_found);
+			return ComFunc.getString(context, R.string.msg_device_no_found);
 		return mUsb.getShortDesc();
 	}
 
@@ -463,6 +463,20 @@ public class Function extends Constant {
 		int start = 8;
 		String s = bs[start + 3] + "." + bs[start + 2] + "." + bs[start];
 		return s;
+	}
+	
+	public int getFramewareIntId() {
+		if (!mUsb.isAvail())
+			return 0;
+
+		byte[] bs = __getFramewareId();
+		if (bs == null)
+			return 0;
+
+		int start = 8;
+		int val = bs[start + 3] << 16 | bs[start + 2] << 8 | bs[start];
+		//String s = bs[start + 3] + "." + bs[start + 2] + "." + bs[start];
+		return val;
 	}
 
 	public CalInfo readCalInfo() {

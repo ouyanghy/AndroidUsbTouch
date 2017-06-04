@@ -1,6 +1,14 @@
 package com.ou.common;
 
 public class Constant {	
+	public static final int ITEM_VERSION 		= 0;
+	public static final int ITEM_SETTING 		= 1;
+	public static final int ITEM_KEY 			= 2;
+	public static final int ITEM_HARDWARETEST 	= 3;
+	public static final int ITEM_CALIB 			= 4;
+	public static final int ITEM_UPGRADE 		= 5;
+	public static final String ITEM_KEY_TEXT 		= "text item key";
+	public static final String ITEM_KEY_IMG 		= "img item key";
 	public static final int VID = 0x0AC8;
 	
 	public static final int PID_NORMAL = 0xCB0B;
@@ -112,7 +120,11 @@ public class Constant {
 	public static final int MSG_SHORTCUT_WRITE_SUCC = 50;
 	
 	public static final int MSG_SETTING_NOT_CMP = 51;
-	
+	public static final int MSG_DEVICE_NOT_OPEN = 52;
+	public static final int MSG_DEVICE_GET_FW_ID = 53;
+
+	public static final int MSG_DEVICE_GET_FW_ID_FAIL = 54;
+	public static final int MSG_FILE_NO_PERMISSION = 55;
 	public static final int [] BOARD_CONFIG_SIZE = {
 		100,23,37,47,65,67,77,66
 	};

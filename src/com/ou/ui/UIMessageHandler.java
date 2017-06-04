@@ -170,7 +170,23 @@ public class UIMessageHandler extends Handler {
 		case Constant.MSG_SHORTCUT_WRITE_SUCC:
 			notice(context, R.string.msg_shortcut_write_succ, true);
 			break;	
-		
+			
+		case Constant.MSG_DEVICE_GET_FW_ID_FAIL:
+			
+			notice(context, R.string.msg_get_id_fail, true);
+			break;	
+		case Constant.MSG_DEVICE_GET_FW_ID:
+			int id = msg.arg1;
+			String s = ((id >> 16) & 0xff)  + "." + ((id >> 8) & 0xff) + "." + (id & 0xff);
+			notice(context, s, true);
+			break;	
+		case Constant.MSG_DEVICE_NOT_OPEN:
+			notice(context, R.string.msg_device_no_found, true);
+			break;	
+			
+		case Constant.MSG_FILE_NO_PERMISSION:
+			notice(context, R.string.msg_file_not_permission, true);
+			break;	
 		}
 	}
 }

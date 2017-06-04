@@ -6,13 +6,16 @@
     <string name="button_id">版本号</string>
     <string name="button_setting">设置</string>
     <string name="button_hardware">硬件检测</string>
+       <string name="button_key">快捷键</string>
     <string name="button_upgrade">更新固件</string>
     <string name="button_checksum">校准</string>
     <string name="setting_screen_info">屏幕尺寸</string>
     <string name="setting_screen_mode">屏幕尺寸</string>
     <string name="setting_clear_cal">清除校验</string>
     <string name="setting_reset">重置</string>
-
+  <string name="device_info">设备信息:</string>
+    <string name="msg_file_not_permission">没有访问文件权限</string>
+    
     <string-array name="screen_size">
         <item>67(256*128)</item>
     </string-array>
@@ -28,12 +31,12 @@
     <string name="msg_setting_initing">正在初始化</string>
     <string name="device_open_succ">打开成功</string>
     <string name="device_open_err">打开失败</string>
-    <string name="device_no_found">未找到设备</string>
+    <string name="msg_device_no_found">未找到设备</string>
     <string name="device_found">找到设备</string>
     <string name="device_opend">设备已经打开</string>
-    <string name="device_no_open">设备还未打开</string>
+    <string name="msg_device_no_open">设备还未打开</string>
     <string name="device_close">关闭设备</string>
-    <string name="get_id_fail">获取ID失败</string>
+    <string name="msg_get_id_fail">获取ID失败</string>
     <string name="msg_device_need_permission">需要USB权限</string>
     <string name="msg_device_request_permission_err">获取USB权限失败</string>
     <string name="msg_device_request_permission_succ">获取USB权限成功</string>

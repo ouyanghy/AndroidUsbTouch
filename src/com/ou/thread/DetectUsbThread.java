@@ -6,7 +6,6 @@ import com.ou.base.Device;
 import com.ou.base.Function;
 import com.ou.common.ComFunc;
 import com.ou.common.Constant;
-import com.ou.usbtp.R;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -92,11 +91,12 @@ public class DetectUsbThread extends Thread {
 
 		// mTv.setText("≥ı ºªØ\n");
 		if (mUsb.isAvail() == false) {
-			ComFunc.sendMessage(R.string.device_no_found, mContext);
+			//ComFunc.sendMessage(R.string.msg_device_no_found, mContext);
 			//ComFunc.log("device is invalid");
 			return;
-		} else
-			ComFunc.sendMessage(R.string.device_found, mContext);
+		} 
+		//else
+		//	ComFunc.sendMessage(R.string.device_found, mContext);
 
 		boolean has_permission = mUsb.checkUsbPermission();
 		if (has_permission) {	

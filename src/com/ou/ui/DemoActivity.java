@@ -1,5 +1,8 @@
 package com.ou.ui;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import com.ou.base.CallBack;
 import com.ou.base.Function;
 import com.ou.common.ComFunc;
@@ -16,18 +19,18 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.TextView;
+import android.view.Window;
+import android.view.WindowManager;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.GridView;
+import android.widget.SimpleAdapter;
 
-public class DemoActivity extends Activity implements OnClickListener, CallBack {
+public class DemoActivity extends Activity implements  CallBack {
 
-	protected static final String TAG = "TpActivity";
 	final int FILE_SELECT_CODE = 1;
 	Function mFunc;
-	TextView mTv;
 	UIMessageHandler mHandler;
-	Button mBtnOpen, mBtnClose, mBtnId, mBtnSetting, mBtnTest, mBtnHardwareTest, mBtnCal, mBtnUpgrade;
 	boolean bUpgrade = false;
 	boolean bAttach = false;
 	DetectUsbThread mDetectThread;
@@ -38,35 +41,72 @@ public class DemoActivity extends Activity implements OnClickListener, CallBack 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_usb_tp);
-		// setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+		setContentView(R.layout.grid_main);
+		
 		mApp = this;
-		mTv = (TextView) findViewById(R.id.tv);
-		mBtnOpen = (Button) findViewById(R.id.buttonOpen);
-		mBtnClose = (Button) findViewById(R.id.buttonClose);
-		mBtnId = (Button) findViewById(R.id.buttonId);
-		mBtnSetting = (Button) findViewById(R.id.buttonSetting);
-		mBtnTest = (Button) findViewById(R.id.buttonKeyset);
-		mBtnHardwareTest = (Button) findViewById(R.id.buttonHardwareTest);
-		mBtnCal = (Button) findViewById(R.id.buttonCal);
-		mBtnUpgrade = (Button) findViewById(R.id.buttonUpgrde);
-		mBtnOpen.setOnClickListener(this);
-		mBtnClose.setOnClickListener(this);
-		mBtnId.setOnClickListener(this);
-		mBtnSetting.setOnClickListener(this);
-		mBtnTest.setOnClickListener(this);
-		mBtnHardwareTest.setOnClickListener(this);
-		mBtnCal.setOnClickListener(this);
-		mBtnUpgrade.setOnClickListener(this);
-		mTv.setOnClickListener(this);
+		
 		mHandler = new UIMessageHandler();
-		mTv.setText(ComFunc.getString(this, R.string.device_no_found));
+		setTitle(ComFunc.getString(this, R.string.msg_device_no_found));
+		addItem();
+		
 		mDetectThread = new DetectUsbThread(getApplicationContext(), this);
 		mDetectThread.start();
 		ComFunc.log("demo onCreate");
-
 	}
 
+	private void addItem() {
+		GridView gridview = (GridView) findViewById(R.id.gridview);
+
+		ArrayList<HashMap<String, Object>> lstImageItem = new ArrayList<HashMap<String, Object>>();
+
+		HashMap<String, Object> map;
+		map = new HashMap<String, Object>();
+		map.put(Constant.ITEM_KEY_IMG, R.drawable.id);
+		map.put(Constant.ITEM_KEY_TEXT, ComFunc.getString(mApp, R.string.button_id));
+		lstImageItem.add(map);
+		
+		map = new HashMap<String, Object>();
+		map.put(Constant.ITEM_KEY_IMG, R.drawable.setting);
+		map.put(Constant.ITEM_KEY_TEXT, ComFunc.getString(mApp, R.string.button_setting));
+		lstImageItem.add(map);
+		
+		map = new HashMap<String, Object>();
+		map.put(Constant.ITEM_KEY_IMG, R.drawable.key);
+		map.put(Constant.ITEM_KEY_TEXT, ComFunc.getString(mApp, R.string.button_key));
+		lstImageItem.add(map);
+		
+		map = new HashMap<String, Object>();
+		map.put(Constant.ITEM_KEY_IMG, R.drawable.hardwaretest);
+		map.put(Constant.ITEM_KEY_TEXT, ComFunc.getString(mApp, R.string.button_hardware));
+		lstImageItem.add(map);
+		
+		map = new HashMap<String, Object>();
+		map.put(Constant.ITEM_KEY_IMG, R.drawable.cal);
+		map.put(Constant.ITEM_KEY_TEXT,  ComFunc.getString(mApp, R.string.button_checksum));
+		lstImageItem.add(map);
+		
+		map = new HashMap<String, Object>();
+		map.put(Constant.ITEM_KEY_IMG, R.drawable.upgrade);
+		map.put(Constant.ITEM_KEY_TEXT,  ComFunc.getString(mApp, R.string.button_upgrade));
+		lstImageItem.add(map);
+
+		SimpleAdapter saImageItems = new SimpleAdapter(this, 
+				lstImageItem, 
+				R.layout.grid_item,
+				new String[] { Constant.ITEM_KEY_IMG, Constant.ITEM_KEY_TEXT},
+				new int[] { R.id.ItemImage, R.id.ItemText });
+		gridview.setAdapter(saImageItems);
+		gridview.setOnItemClickListener(mClickListener);
+	}
+	
+	OnItemClickListener mClickListener = new OnItemClickListener() {
+
+		@Override
+		public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+			// TODO Auto-generated method stub
+			onClick(position);
+		}
+	};
 	@Override
 	protected void onDestroy() {
 		ComFunc.log("demo onDestroy");
@@ -85,14 +125,15 @@ public class DemoActivity extends Activity implements OnClickListener, CallBack 
 		return super.onKeyDown(keyCode, event);
 	}
 
-	@Override
-	public void onClick(View v) {
+	
+	public void onClick(int id) {
 		// TODO Auto-generated method stub
-		int id = v.getId();
+/*		int id = v.getId();*/
 		boolean r = false;
 		r = DetectUsbThread.isUsbEnable();
 		if (r == false) {
-			mTv.setText(ComFunc.getString(getApplicationContext(), R.string.device_no_open) + "\n");
+			//setTitle(ComFunc.getString(getApplicationContext(), R.string.device_no_open) + "\n");
+			ComFunc.sendMessage(Constant.MSG_DEVICE_NOT_OPEN, this);
 			return;
 		}
 
@@ -100,20 +141,22 @@ public class DemoActivity extends Activity implements OnClickListener, CallBack 
 		/*
 		 * case R.id.buttonOpen: break; case R.id.buttonClose: ; break;
 		 */
-		case R.id.buttonId:
+		case Constant.ITEM_VERSION:
 			if (!bNormalMode)
 				return;
 
 			mFunc = DetectUsbThread.getUsbFunction();
-			String s = mFunc.getFramewareId();
-			if (s == null) {
-				mTv.append(ComFunc.getString(getApplicationContext(), R.string.get_id_fail) + "\n");
+			int v = mFunc.getFramewareIntId();
+			if (v <= 0) {
+				ComFunc.sendMessage(Constant.MSG_DEVICE_GET_FW_ID_FAIL, this);
+				//mTv.append(ComFunc.getString(getApplicationContext(), R.string.get_id_fail) + "\n");
 				break;
 			}
-			mTv.append(s + "\n");
+			ComFunc.sendMessage(Constant.MSG_DEVICE_GET_FW_ID,v, this);
+			//mTv.append(s + "\n");
 
 			break;
-		case R.id.buttonSetting:
+		case Constant.ITEM_SETTING:
 			if (!bNormalMode)
 				return;
 
@@ -123,7 +166,7 @@ public class DemoActivity extends Activity implements OnClickListener, CallBack 
 
 			break;
 
-		case R.id.buttonHardwareTest:
+		case Constant.ITEM_HARDWARETEST:
 			if (!bNormalMode)
 				return;
 
@@ -138,27 +181,22 @@ public class DemoActivity extends Activity implements OnClickListener, CallBack 
 			startActivity(intent);
 
 			break;
-		case R.id.buttonKeyset:
+		case Constant.ITEM_KEY:
 			if (!bNormalMode)
 				return;
 
 			startActivity(new Intent(this, ShortCutActivity.class));
 			break;
 
-		case R.id.buttonCal:
+		case Constant.ITEM_CALIB:
 			if (!bNormalMode)
 				return;
 
 			startActivity(new Intent(mApp, CalActivity.class));
 			break;
 
-		case R.id.buttonUpgrde:
+		case Constant.ITEM_UPGRADE:
 			startSelectFile();
-			break;
-
-		case R.id.tv:
-
-			mTv.setText("");
 			break;
 		}
 
@@ -249,12 +287,12 @@ public class DemoActivity extends Activity implements OnClickListener, CallBack 
 		if (DetectUsbThread.isUsbEnable()) {
 
 			mFunc = Function.getTpUsbFunction();
-			mTv.setText(mFunc.getShortDesc(this));
+			setTitle(ComFunc.getString(this, R.string.device_info) + mFunc.getShortDesc(this));
 			int pid = mFunc.getPid();
 			if (pid != Constant.PID_NORMAL) {
 				bNormalMode = false;
 				if (mUpdateThread == null || (mUpdateThread != null && mUpdateThread.getWorkState() == false)) {
-					mTv.setText(ComFunc.getString(mApp, R.string.bad_mode));
+					setTitle(ComFunc.getString(mApp, R.string.bad_mode));
 					return;
 				}
 
@@ -262,7 +300,7 @@ public class DemoActivity extends Activity implements OnClickListener, CallBack 
 				bNormalMode = true;
 			}
 		} else {
-			mTv.setText(ComFunc.getString(this, R.string.device_no_found));
+			setTitle(ComFunc.getString(this, R.string.msg_device_no_found));
 		}
 
 	}

@@ -13,7 +13,7 @@
         android:id="@+id/buttonFilePath"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#0099FF"
+        android:background="#FF3456"
         android:text="Current_PATH" />
 
     <ListView

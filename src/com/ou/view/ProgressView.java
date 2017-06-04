@@ -73,7 +73,7 @@ public class ProgressView extends View {
 			mMiddle.x = w / 2;
 			mMiddle.y = h / 2;
 			if (w > h) {
-				cir = h * 4 / 5;
+				cir = h * 4/ 5;
 				left = mMiddle.x - cir / 2;
 				right = left + cir;
 				top = mMiddle.y - cir / 2;
@@ -95,19 +95,19 @@ public class ProgressView extends View {
 		mPaint.setColor(Color.GRAY);
 		canvas.drawArc(mRect, 0, 360, true, mPaint);
 
-		mPaint.setColor(Color.YELLOW);
+		mPaint.setColor(Color.rgb(0xFF, 0x34, 0x56));
 		float deg = ((float) mPercent / 100) * 360;
 		canvas.drawArc(mRect, 0, deg, true, mPaint);
 
-		mPaint.setColor(Color.RED);
+		mPaint.setColor(Color.YELLOW);
 
 		float size = mPaint.getTextSize();
 		String s = mPercent + "%";
-		canvas.drawText(s, mMiddle.x - size * s.length()/ 2, mMiddle.y + size / 2, mPaint);
+		canvas.drawText(s, mMiddle.x - (size * s.length())/ 2, mMiddle.y + size / 2, mPaint);
 
 		mPaint.setColor(Color.WHITE);
 		
-		canvas.drawText(mNote, mMiddle.x - size * mNote.length()/2, size + 2, mPaint);
+		canvas.drawText(mNote, mMiddle.x - size * mNote.length()/2, size, mPaint);
 	}
 
 }

@@ -17,13 +17,15 @@ import android.graphics.PointF;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Handler.Callback;
 import android.os.Message;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
-import android.os.Handler.Callback;
 
 
 public class ShortCutActivity extends Activity implements OnClickListener,KeyCntDialog.Result{
@@ -52,6 +54,8 @@ public class ShortCutActivity extends Activity implements OnClickListener,KeyCnt
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.shortcut);
 		mBtnUp = (Button) findViewById(R.id.buttonShortCutUp);
 		mBtnDown = (Button) findViewById(R.id.buttonShortCutDown);
