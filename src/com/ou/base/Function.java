@@ -15,6 +15,7 @@ public class Function extends Constant {
 	private Device mUsb;
 	private static Function mThis = null;
 	private int mProgress = Constant.PROGRESS_UNSTART;
+
 	public Function(Device t) {
 		mUsb = t;
 		mThis = this;
@@ -120,12 +121,6 @@ public class Function extends Constant {
 		// byte[] mode_commands = { 0x5, 0x03 };
 		byte[] ret;
 
-		ret = switchMode(SET_MODE);
-		if (ret == null) {
-			// log("send command fail", mode_commands,mode_commands.length);
-			return null;
-		}
-
 		ComFunc.sleep(20);
 		int addr = (FW_VERSION_ADDR + 4) | EXTERNAL_FLASH_ADDRESS;
 		byte[] command_id = getReadCommandHead(addr, 4);
@@ -141,6 +136,7 @@ public class Function extends Constant {
 			ComFunc.log("recv command_id fail");
 			return null;
 		}
+
 		return ret;
 	}
 
@@ -184,21 +180,21 @@ public class Function extends Constant {
 
 	private byte[] recvResult() {
 
-		return recvResult(0x40);
+		return recvResult(0x40, 20);
 	}
 
-	private byte[] recvResult(int len) {
+	private byte[] recvResult(int len, int wait) {
 		if (!mUsb.isAvail())
 			return null;
 
 		int cnt = 0;
 		byte[] ret;
-		ComFunc.sleep(20);
+		ComFunc.sleep(wait);
 		do {
 			ret = mUsb.recvResult(len);
 			if (ret == null) {
 				if (cnt++ < 3) {
-					ComFunc.sleep(20);
+					ComFunc.sleep(wait);
 					continue;
 				} else {
 					break;
@@ -208,13 +204,13 @@ public class Function extends Constant {
 
 			// Common.log("ret1:" + ret[1]);
 			if (ret[1] == 0xff || ret[1] == -1) {
-				ComFunc.sleep(20);
+				ComFunc.sleep(wait);
 				// Common.log("recvResult error retry");
-				ComFunc.log("retry recv cnt:" + cnt);
+				ComFunc.log("recv retry recv cnt:" + cnt);
 			} else {
-				cnt = 3;
+				cnt = 6;
 			}
-		} while (cnt++ < 3);
+		} while (cnt++ < 6);
 
 		return ret;
 	}
@@ -231,7 +227,6 @@ public class Function extends Constant {
 		byte[] ret = mUsb.sendCommand(command, command.length);
 		if (ret == null)
 			return null;
-		ComFunc.sleep(40);
 		ret = recvResult();
 
 		return ret;
@@ -304,7 +299,6 @@ public class Function extends Constant {
 			if (ret == null)
 				return null;
 
-			ComFunc.sleep(40);
 			ret = recvResult();
 			if (ret == null) {
 				ComFunc.log("recv command_id fail");
@@ -336,8 +330,6 @@ public class Function extends Constant {
 		// Common.log("read point:" + point_num);
 		if (point_num == 0)
 			return null;
-
-		ComFunc.sleep(20);
 
 		return ComFunc.memcut(ret, 3, 3 + 4);
 	}
@@ -400,7 +392,7 @@ public class Function extends Constant {
 			ComFunc.log("erase FW_VERSION_ADDR err 1");
 			return false;
 		}
-		mProgress = 78;
+		mProgress = 88;
 		/* write fw */
 		command = getWriteCommandHead(addr, 4, version);
 		ret = mUsb.sendCommand(command, command.length);
@@ -428,9 +420,9 @@ public class Function extends Constant {
 			return false;
 		}
 
-		ret = switchMode(FIRMWARE_MODE);
+		boolean r = switchMode(FIRMWARE_MODE);
 		mProgress = PROGRESS_FLASH_FINISH;
-		return true;
+		return r;
 	}
 
 	private byte[] __writeCalKey(byte[] data) {
@@ -439,105 +431,18 @@ public class Function extends Constant {
 		return ret;
 	}
 
-	/* public funciton */
-	public byte[] switchMode(int mode) {
+	private byte[] __switchMode(int mode) {
 		if (!mUsb.isAvail())
 			return null;
 
 		byte[] bs = { REPORT_ID_OUT_CMD, CMD_SET_MODE, (byte) mode };
 		byte[] ret = mUsb.sendCommand(bs, bs.length);
-		ComFunc.sleep(20);
 		ret = recvResult();
 
 		return ret;
 	}
 
-	public String getFramewareId() {
-		if (!mUsb.isAvail())
-			return null;
-
-		byte[] bs = __getFramewareId();
-		if (bs == null)
-			return null;
-
-		int start = 8;
-		String s = bs[start + 3] + "." + bs[start + 2] + "." + bs[start];
-		return s;
-	}
-	
-	public int getFramewareIntId() {
-		if (!mUsb.isAvail())
-			return 0;
-
-		byte[] bs = __getFramewareId();
-		if (bs == null)
-			return 0;
-
-		int start = 8;
-		int val = bs[start + 3] << 16 | bs[start + 2] << 8 | bs[start];
-		//String s = bs[start + 3] + "." + bs[start + 2] + "." + bs[start];
-		return val;
-	}
-
-	public CalInfo readCalInfo() {
-		if (!mUsb.isAvail())
-			return null;
-
-		byte[] bs = __getCalInfo();
-		CalInfo cal = new CalInfo();
-		if (bs == null)
-			return null;
-
-		byte[] data = ComFunc.memcut(bs, 8, bs.length - 8);
-		cal.parse(data);
-		return cal;
-	}
-
-	public boolean eraseCalInfo() {
-		if (!mUsb.isAvail())
-			return false;
-
-		byte[] ret = __eraseCalInfo();
-		if (ret == null)
-			return false;
-
-		return true;
-
-	}
-
-	public boolean writeCalInfo(CalInfo info) {
-		if (!mUsb.isAvail())
-			return false;
-
-		byte[] ret = __writeCalInfo(info);
-		if (ret == null)
-			return false;
-
-		return true;
-	}
-
-	public boolean eraseBroadInfo() {
-		if (!mUsb.isAvail())
-			return false;
-
-		byte[] ret = __eraseBroadInfo();
-		if (ret == null)
-			return false;
-		return true;
-	}
-
-	public boolean writeBroadInfo(BoardConfig con) {
-		if (!mUsb.isAvail())
-			return false;
-
-		byte[] ret = __writeBroadInfo(con);
-		if (ret == null)
-			return false;
-
-		return true;
-	}
-
-	public int readBroadInfoScreenSize() {
+	private int __readBroadInfoScreenSize() {
 		if (!mUsb.isAvail())
 			return -1;
 
@@ -554,6 +459,121 @@ public class Function extends Constant {
 		int size = ret[PACKAGE_RECV_DATA_START + 0] | ret[PACKAGE_RECV_DATA_START + 1] >> 8
 				| ret[PACKAGE_RECV_DATA_START + 2] >> 16 | ret[PACKAGE_RECV_DATA_START + 3] >> 24;
 
+		return size;
+	}
+
+	/* public funciton */
+	public boolean switchMode(int mode) {
+		if (!mUsb.isAvail())
+			return false;
+
+		byte[] ret = __switchMode(mode);
+		if (ret == null)
+			return false;
+		return true;
+	}
+
+	public String getFramewareId() {
+		if (!mUsb.isAvail())
+			return null;
+
+		__switchMode(SET_MODE);
+		byte[] bs = __getFramewareId();
+		__switchMode(TOUCH_MODE);
+		if (bs == null)
+			return null;
+
+		int start = 8;
+		String s = bs[start + 3] + "." + bs[start + 2] + "." + bs[start];
+		return s;
+	}
+
+	public int getFramewareIntId() {
+		if (!mUsb.isAvail())
+			return 0;
+
+		__switchMode(SET_MODE);
+		byte[] bs = __getFramewareId();
+		__switchMode(TOUCH_MODE);
+		if (bs == null)
+			return 0;
+
+		int start = 8;
+		int val = bs[start + 3] << 16 | bs[start + 2] << 8 | bs[start];
+		// String s = bs[start + 3] + "." + bs[start + 2] + "." + bs[start];
+		return val;
+	}
+
+	public CalInfo readCalInfo() {
+		if (!mUsb.isAvail())
+			return null;
+
+		__switchMode(SET_MODE);
+		byte[] bs = __getCalInfo();
+		__switchMode(TOUCH_MODE);
+		CalInfo cal = new CalInfo();
+		if (bs == null)
+			return null;
+
+		byte[] data = ComFunc.memcut(bs, 8, bs.length - 8);
+		cal.parse(data);
+		return cal;
+	}
+
+	public boolean eraseCalInfo() {
+		if (!mUsb.isAvail())
+			return false;
+
+		__switchMode(SET_MODE);
+		byte[] ret = __eraseCalInfo();
+		__switchMode(TOUCH_MODE);
+		if (ret == null)
+			return false;
+
+		return true;
+
+	}
+
+	public boolean writeCalInfo(CalInfo info) {
+		if (!mUsb.isAvail())
+			return false;
+		__switchMode(SET_MODE);
+		byte[] ret = __writeCalInfo(info);
+		__switchMode(TOUCH_MODE);
+		if (ret == null)
+			return false;
+
+		return true;
+	}
+
+	public boolean eraseBroadInfo() {
+		if (!mUsb.isAvail())
+			return false;
+		__switchMode(SET_MODE);
+		byte[] ret = __eraseBroadInfo();
+		__switchMode(TOUCH_MODE);
+		if (ret == null)
+			return false;
+		return true;
+	}
+
+	public boolean writeBroadInfo(BoardConfig con) {
+		if (!mUsb.isAvail())
+			return false;
+
+		__switchMode(SET_MODE);
+		byte[] ret = __writeBroadInfo(con);
+		__switchMode(TOUCH_MODE);
+		if (ret == null)
+			return false;
+
+		return true;
+	}
+
+	public int readBroadInfoScreenSize() {
+		__switchMode(SET_MODE);
+		int size = __readBroadInfoScreenSize();
+		__switchMode(TOUCH_MODE);
 		return size;
 	}
 
@@ -584,7 +604,9 @@ public class Function extends Constant {
 		if (!mUsb.isAvail())
 			return null;
 
+		__switchMode(SET_MODE);
 		byte[] ret = __readCalPoint();
+		__switchMode(TOUCH_MODE);
 		if (ret == null || ret.length < 4)
 			return null;
 
@@ -610,8 +632,7 @@ public class Function extends Constant {
 		if (ret == null)
 			return null;
 
-		ComFunc.sleep(40);
-		ret = recvResult(len);
+		ret = recvResult(len, 10);
 		if (ret == null) {
 			ComFunc.log("recv command_id fail");
 			return null;
@@ -624,8 +645,6 @@ public class Function extends Constant {
 		// return Common.memcut(rcv, 0, len);
 		return ComFunc.memcut(ret, 7, len - 7);
 	}
-
-	
 
 	public void setProgress(int v) {
 		mProgress = v;
@@ -668,7 +687,7 @@ public class Function extends Constant {
 			return false;
 
 		mProgress = Constant.PROGRESS_UNSTART;
-		byte[] ret = switchMode(SET_MODE);
+		byte[] ret = __switchMode(SET_MODE);
 		if (ret == null) {
 			ComFunc.log("prepareUpgrade error swich set mode");
 			return false;
@@ -687,17 +706,17 @@ public class Function extends Constant {
 			return false;
 		}
 		mProgress = 2;
-		ret = switchMode(BOOTLOADER_MODE);
+		ret = __switchMode(BOOTLOADER_MODE);
 		if (ret == null) {
 			ComFunc.log("prepareUpgrade error swich set mode");
 			return false;
 		}
-		mProgress = 10;
+		mProgress = 20;
 		return true;
 
 	}
 
-	public boolean upgrade(File f) throws IOException {
+	private boolean upgrade(File f) throws IOException {
 		if (!mUsb.isAvail())
 			return false;
 
@@ -708,7 +727,7 @@ public class Function extends Constant {
 		int offset = 0;
 		byte[] version = new byte[4];
 		int file_len = 0;
-		mProgress = 11;
+		mProgress = 21;
 		file_len = (int) (f.length() - 8);
 		FileInputStream in = new FileInputStream(f);
 		do {
@@ -726,12 +745,12 @@ public class Function extends Constant {
 		ComFunc.log("version:" + version);
 
 		/* switch emcry mode */
-		mProgress = 15;
+		mProgress = 25;
 		byte[] ret;
 		int cnt = 0;
 		do {
 			ComFunc.sleep(40);
-			ret = switchMode(Constant.EMCRYPTION_OPEN);
+			ret = __switchMode(Constant.EMCRYPTION_OPEN);
 			if (ret == null) {
 				ComFunc.log("switchMode(Enums.EMCRYPTION_OPEN) err 0 try:" + cnt);
 				continue;
@@ -744,7 +763,7 @@ public class Function extends Constant {
 				// return false;
 			}
 		} while (cnt++ < 3);
-		mProgress = 16;
+		mProgress = 26;
 		/* erase */
 
 		int packetCount = (file_len + (Constant.KB - 1)) / Constant.KB;
@@ -755,7 +774,7 @@ public class Function extends Constant {
 			ComFunc.log("erase FW_UPDATEFLAG_ADDR err 0");
 			return false;
 		}
-		ComFunc.sleep(20);
+
 		ret = recvResult();
 		if (ret == null) {
 			ComFunc.log("erase FW_UPDATEFLAG_ADDR err 1");
@@ -792,7 +811,7 @@ public class Function extends Constant {
 
 		/* switch offemcry mode */
 		mProgress++;// 13
-		ret = switchMode(Constant.EMCRYPTION_CLOSE);
+		ret = __switchMode(Constant.EMCRYPTION_CLOSE);
 		if (ret == null) {
 			ComFunc.log("switchMode(Enums.EMCRYPTION_CLOSE) 0");
 			return false;
@@ -803,7 +822,7 @@ public class Function extends Constant {
 			ComFunc.log("switchMode(Enums.EMCRYPTION_CLOSE) 1");
 			return false;
 		}
-		mProgress = 76;
+		mProgress = 86;
 		return upgradeVersion(version);
 	}
 
@@ -811,7 +830,7 @@ public class Function extends Constant {
 		if (!mUsb.isAvail())
 			return false;
 
-		byte[] ret = switchMode(SET_MODE);
+		byte[] ret = __switchMode(SET_MODE);
 		if (ret == null)
 			return false;
 
@@ -824,8 +843,8 @@ public class Function extends Constant {
 		if (ret == null)
 			return false;
 
-		ComFunc.sleep(20);
 		ret = __writeCalKey(data);
+		__switchMode(TOUCH_MODE);
 		if (ret == null)
 			return false;
 		return true;

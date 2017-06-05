@@ -125,6 +125,7 @@ public class Constant {
 
 	public static final int MSG_DEVICE_GET_FW_ID_FAIL = 54;
 	public static final int MSG_FILE_NO_PERMISSION = 55;
+	public static final int MSG_DO_NOT_DETACH = 56;
 	public static final int [] BOARD_CONFIG_SIZE = {
 		100,23,37,47,65,67,77,66
 	};
@@ -142,15 +143,15 @@ public class Constant {
 	public static final int PROGRESS_UNSTART = 0;
 	public static final int PROGRESS_EMCRYPTION_OPEN = 1;
 	public static final int PROGRESS_READ_FILE = 2;
-	public static final int PROGRESS_FLASH_FINISH = 80;
+	public static final int PROGRESS_FLASH_FINISH = 90;
 	public static final int PROGRESS_FINISH = 100;
 	public static final int PROGRESS_ERR = -1;
 	
 	public static final int DEVICE_INTERFACE_NORMAL = 2;
 	public static final int DEVICE_INTEFFACE_BOOT = 0;
 	
-	public static final int PROGRESS_SWITCH_BOOT = 10;
-	public static final int PROGRESS_WRITE_DATA = 20;
+	public static final int PROGRESS_SWITCH_BOOT = 20;
+	public static final int PROGRESS_WRITE_DATA = 30;
 	
 	public static final String FIRST_BLOOD = "first open ";
 	public static final int CAL_POINT_TIMEOUT = 10 * 1000;

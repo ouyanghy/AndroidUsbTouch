@@ -82,8 +82,8 @@ public class ShortCutView extends View {
 		mPaint.setColor(Color.RED);
 		float x = mMiddle.x / 2;
 		float y = mMiddle.y / 10;
-		canvas.drawText(s, x, y, mPaint);
-
+		canvas.drawText(s.substring(0, 21), x, y, mPaint);
+		canvas.drawText(s.substring(21), x, y + mPaint.getTextSize(), mPaint);
 		mPaint.setColor(Color.WHITE);
 		x = mMiddle.x / 2;
 		y = mHeight - mMiddle.y / 10;

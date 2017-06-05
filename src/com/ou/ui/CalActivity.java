@@ -47,6 +47,7 @@ public class CalActivity extends Activity implements OnClickListener {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.cal);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		
 		mApp = this;
 		mLock = new Object();
@@ -165,6 +166,7 @@ public class CalActivity extends Activity implements OnClickListener {
 			if (bTouchUp == false)
 				return super.onTouchEvent(event);
 			
+			mWorker = new CalPointThread(mHandler);
 			mWorker.start();
 			bTouchUp = false;
 			ComFunc.log("ouyang touch up start cal thread");
@@ -223,7 +225,6 @@ public class CalActivity extends Activity implements OnClickListener {
 			return false;
 		
 		r = func.writeCalInfo(cal);
-		
 		
 		return r;
 	}

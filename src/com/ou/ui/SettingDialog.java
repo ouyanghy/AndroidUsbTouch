@@ -54,16 +54,11 @@ public class SettingDialog extends Dialog implements OnClickListener {
 		mDetectHandler = new DetectFinishHandler();
 
 		loadAllBroadInfo();
-		initBackGround(Constant.MSG_SETTING_INIT_SUCC, Constant.IGNORE);
+		initBackGround(Constant.IGNORE, Constant.IGNORE);
 	}
 
 	@Override
 	public void dismiss() {
-		byte ret[] = mFunc.switchMode(Constant.TOUCH_MODE);
-		if (ret == null) {
-			ComFunc.sendMessage(Constant.MSG_TOUCH_MODE_ERR, getContext());
-		}
-
 		super.dismiss();
 	}
 
@@ -149,12 +144,7 @@ public class SettingDialog extends Dialog implements OnClickListener {
 	}
 
 	private void initSetting(int notice_id_succ, int notice_id_fail) {
-		byte ret[] = mFunc.switchMode(Constant.SET_MODE);
-		if (ret == null) {
-			//ComFunc.sendMessage(Constant.MSG_SET_MODE_ERR, getContext());
-			return;
-		}
-
+		
 		ComFunc.sleep(20);
 		CalInfo calInfo = mFunc.readCalInfo();
 		if (calInfo == null) {

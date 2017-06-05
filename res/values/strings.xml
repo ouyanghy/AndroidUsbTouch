@@ -14,6 +14,7 @@
     <string name="setting_clear_cal">清除校验</string>
     <string name="setting_reset">重置</string>
   <string name="device_info">设备信息:</string>
+    <string name="fw_info">版本号:</string>
     <string name="msg_file_not_permission">没有访问文件权限</string>
     
     <string-array name="screen_size">
@@ -115,5 +116,5 @@
     <string name="signal_unpass">FAIL</string>
     <string name="bad_mode">固件版本错误,请升级固件</string>
     <string name="ask_exit">是否退出应用</string>
-
+ 	<string name="msg_note_do_notdetach">固件升级中,请勿插拔设备</string>
 </resources>

@@ -19,7 +19,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
@@ -42,6 +41,8 @@ public class DemoActivity extends Activity implements  CallBack {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.grid_main);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+	//	setTitleColor(Color.rgb(0xFF, 0x34, 0x56));
 		
 		mApp = this;
 		
@@ -110,6 +111,10 @@ public class DemoActivity extends Activity implements  CallBack {
 	@Override
 	protected void onDestroy() {
 		ComFunc.log("demo onDestroy");
+		if (DetectUsbThread.isUsbEnable() ) {
+			mFunc = Function.getTpUsbFunction();
+			mFunc.switchMode(Constant.TOUCH_MODE);
+		}
 		mDetectThread.release();
 		super.onDestroy();
 	}
@@ -232,8 +237,11 @@ public class DemoActivity extends Activity implements  CallBack {
 
 	private boolean ensureUpdate(final Intent data) {
 		AlertDialog.Builder build = new Builder(this);
-
-		build.setMessage(ComFunc.getString(this, R.string.upgrade_ensure));
+		String message = ComFunc.getString(this, R.string.upgrade_ensure) + "\n";
+		if (data != null && data.getData() != null && data.getData().getPath() != null)
+			message += data.getData().getPath();
+		
+		build.setMessage(message);
 		build.setPositiveButton(ComFunc.getString(mApp, R.string.ok),
 				new android.content.DialogInterface.OnClickListener() {
 

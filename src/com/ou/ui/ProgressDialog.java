@@ -27,6 +27,7 @@ public class ProgressDialog extends Dialog {
 
 	public ProgressDialog(Context context, UpgradeThread update, Intent data) {
 		super(context);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		setContentView(R.layout.progress_dialog);
 		WindowManager.LayoutParams lp = getWindow().getAttributes();
 		lp.dimAmount = 0.0f;
@@ -94,7 +95,7 @@ public class ProgressDialog extends Dialog {
 					ComFunc.sleep(mSleep);
 					sleep_all += mSleep;
 
-					if (sleep_all > 100 * 1000) {
+					if (sleep_all > 80 * 1000) {
 						// some truoble ocur
 						mCurPercent = Constant.PROGRESS_ERR;
 						mPercent = Constant.PROGRESS_ERR;

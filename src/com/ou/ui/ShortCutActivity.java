@@ -57,6 +57,7 @@ public class ShortCutActivity extends Activity implements OnClickListener,KeyCnt
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.shortcut);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 		mBtnUp = (Button) findViewById(R.id.buttonShortCutUp);
 		mBtnDown = (Button) findViewById(R.id.buttonShortCutDown);
 		mBtnLeft = (Button) findViewById(R.id.buttonShortCutLeft);
@@ -116,6 +117,7 @@ public class ShortCutActivity extends Activity implements OnClickListener,KeyCnt
 				return super.onTouchEvent(event);
 			
 			bGetPointWork = true;
+			mPointThread = new CalPointThread(mPointHandler);
 			mPointThread.start();
 /*			bOneFinish = false;
 			float x = event.getX();

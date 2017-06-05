@@ -38,6 +38,8 @@ public class HardwareTestAcitivity extends Activity {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.hardware_test);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
 		int size = getIntent().getIntExtra(Constant.INTENT_SIZE, -1);
 		byte[] buffer = getIntent().getByteArrayExtra(Constant.INTENT_BUFF);

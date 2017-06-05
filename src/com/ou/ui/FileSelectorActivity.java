@@ -35,6 +35,8 @@ public class FileSelectorActivity extends Activity implements OnClickListener {
 		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
 		setContentView(R.layout.file_selector);
+		getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+		
 		mV = (ListView) findViewById(R.id.listViewFile);
 		mBtn = (Button) findViewById(R.id.buttonFilePath);
 		mBtn.setOnClickListener(this);

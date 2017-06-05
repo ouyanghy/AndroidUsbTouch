@@ -177,7 +177,8 @@ public class UIMessageHandler extends Handler {
 			break;	
 		case Constant.MSG_DEVICE_GET_FW_ID:
 			int id = msg.arg1;
-			String s = ((id >> 16) & 0xff)  + "." + ((id >> 8) & 0xff) + "." + (id & 0xff);
+			String s = ComFunc.getString(context, R.string.fw_info);
+			s += ((id >> 16) & 0xff)  + "." + ((id >> 8) & 0xff) + "." + (id & 0xff);
 			notice(context, s, true);
 			break;	
 		case Constant.MSG_DEVICE_NOT_OPEN:
@@ -186,6 +187,10 @@ public class UIMessageHandler extends Handler {
 			
 		case Constant.MSG_FILE_NO_PERMISSION:
 			notice(context, R.string.msg_file_not_permission, true);
+			break;	
+			
+		case Constant.MSG_DO_NOT_DETACH:
+			notice(context, R.string.msg_note_do_notdetach, true);
 			break;	
 		}
 	}
