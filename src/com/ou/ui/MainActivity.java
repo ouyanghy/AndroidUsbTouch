@@ -25,7 +25,7 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.GridView;
 import android.widget.SimpleAdapter;
 
-public class DemoActivity extends Activity implements  CallBack {
+public class MainActivity extends Activity implements  CallBack {
 
 	final int FILE_SELECT_CODE = 1;
 	Function mFunc;
@@ -33,7 +33,7 @@ public class DemoActivity extends Activity implements  CallBack {
 	boolean bUpgrade = false;
 	boolean bAttach = false;
 	DetectUsbThread mDetectThread;
-	DemoActivity mApp;
+	MainActivity mApp;
 	boolean bNormalMode = false;
 	UpgradeThread mUpdateThread;
 

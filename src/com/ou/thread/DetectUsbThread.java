@@ -14,7 +14,7 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbManager;
 
 public class DetectUsbThread extends Thread {
-	private Device mUsb;
+	private static Device mUsb;
 	private static Function mFunc;
 	private Context mContext;
 	private boolean bOpen = false;
@@ -53,7 +53,7 @@ public class DetectUsbThread extends Thread {
 		bExit = false;
 		while (bWork) {
 			work();
-			ComFunc.sleep(200);
+			ComFunc.sleep(100);
 			
 		}
 
@@ -75,6 +75,12 @@ public class DetectUsbThread extends Thread {
 	}
 
 	public static boolean isUsbEnable() {
+		if (mUsb == null)
+			return false;
+		
+		if (mUsb.isAvail() == false)
+			return false;
+		
 		if (mFunc == null)
 			return false;
 

@@ -126,6 +126,8 @@ public class Constant {
 	public static final int MSG_DEVICE_GET_FW_ID_FAIL = 54;
 	public static final int MSG_FILE_NO_PERMISSION = 55;
 	public static final int MSG_DO_NOT_DETACH = 56;
+	public static final int MSG_DEVICE_NOT_FOUND = 57;
+	
 	public static final int [] BOARD_CONFIG_SIZE = {
 		100,23,37,47,65,67,77,66
 	};

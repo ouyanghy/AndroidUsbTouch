@@ -267,6 +267,13 @@ public class ShortCutActivity extends Activity implements OnClickListener,KeyCnt
 				bGetPointWork = false;
 				return false;
 			}
+			
+			if (msg.what ==Constant.MSG_DEVICE_NOT_FOUND) {
+				ComFunc.sendMessage(Constant.MSG_DEVICE_NOT_FOUND, mApp);
+				bGetPointWork = false;
+				return false;
+			}
+			
 			if (msg.what != Constant.MSG_GET_CAL_POINT)
 				return false;
 			

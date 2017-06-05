@@ -16,7 +16,7 @@
   <string name="device_info">设备信息:</string>
     <string name="fw_info">版本号:</string>
     <string name="msg_file_not_permission">没有访问文件权限</string>
-    
+     <string name="msg_exit_retry_again">退出重试</string>
     <string-array name="screen_size">
         <item>67(256*128)</item>
     </string-array>

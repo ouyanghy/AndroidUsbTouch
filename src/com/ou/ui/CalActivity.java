@@ -285,6 +285,10 @@ public class CalActivity extends Activity implements OnClickListener {
 			case Constant.MSG_GET_CAL_POINT_TIME_OUT:
 				mTv.setText(ComFunc.getString(mApp, R.string.cal_timeout));
 				break;
+				
+			case Constant.MSG_DEVICE_NOT_FOUND:
+				mTv.setText(ComFunc.getString(mApp, R.string.msg_device_no_found) + "," +ComFunc.getString(mApp, R.string.msg_exit_retry_again));
+				break;
 			default:
 				break;
 			}

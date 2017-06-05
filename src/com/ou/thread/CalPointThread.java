@@ -30,6 +30,11 @@ public class CalPointThread extends Thread {
 			bWork = true;
 		}
 		while(bWork) {
+			if (DetectUsbThread.isUsbEnable() == false) {	
+				mHandler.obtainMessage(Constant.MSG_DEVICE_NOT_FOUND).sendToTarget();
+				break;
+			}
+			mFunc = Function.getTpUsbFunction();
 			PointF point = mFunc.readCalPoint();
 			if (point != null) {
 				mHandler.obtainMessage(Constant.MSG_GET_CAL_POINT, point).sendToTarget();
@@ -51,9 +56,9 @@ public class CalPointThread extends Thread {
 	public CalPointThread(Handler handler) {
 		if (DetectUsbThread.isUsbEnable() == false) {
 			bWork = false;
-			return;
+		//	return;
 		}
-		mFunc = DetectUsbThread.getUsbFunction();
+		mFunc = Function.getTpUsbFunction();
 		mHandler = handler;
 		mLock = new Object();
 	}

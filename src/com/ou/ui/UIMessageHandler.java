@@ -192,6 +192,10 @@ public class UIMessageHandler extends Handler {
 		case Constant.MSG_DO_NOT_DETACH:
 			notice(context, R.string.msg_note_do_notdetach, true);
 			break;	
+			
+		case Constant.MSG_DEVICE_NOT_FOUND:
+			notice(context, R.string.msg_device_no_found, true);
+			break;	
 		}
 	}
 }
