@@ -185,7 +185,7 @@ public class Device {
 			ComFunc.log("recv ret null");
 			return null;
 		}
-	//	Common.log("recv:", bs, bs.length);
+	//	ComFunc.log("recv:", bs, bs.length);
 		return bs;
 	}
 

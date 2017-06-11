@@ -215,8 +215,9 @@ public class Function extends Constant {
 		return ret;
 	}
 
-	private byte[] __writeCalInfo(CalInfo info) {
+	private byte[] __writeCalInfo(CalInfo info, int flag) {
 		info.setCheckFlag(0x434F4E46);
+		info.setMatrixFlag(flag);
 		byte[] data = info.toByte();
 		int addr = CALIB_INFO_ADDR | EXTERNAL_FLASH_ADDRESS;
 		int data_len = info.getSize();
@@ -327,11 +328,11 @@ public class Function extends Constant {
 
 		ret = recvResult();
 		int point_num = ret[3];
-		// Common.log("read point:" + point_num);
+		ComFunc.log("read point:" + point_num);
 		if (point_num == 0)
 			return null;
 
-		return ComFunc.memcut(ret, 3, 3 + 4);
+		return ComFunc.memcut(ret, 4, 4 + 4);
 	}
 
 	private byte[] sendBlockData(int addr, byte[] data_send, int data_len) {
@@ -508,9 +509,9 @@ public class Function extends Constant {
 		if (!mUsb.isAvail())
 			return null;
 
-		__switchMode(SET_MODE);
+		//__switchMode(SET_MODE);
 		byte[] bs = __getCalInfo();
-		__switchMode(TOUCH_MODE);
+		//__switchMode(TOUCH_MODE);
 		CalInfo cal = new CalInfo();
 		if (bs == null)
 			return null;
@@ -524,9 +525,9 @@ public class Function extends Constant {
 		if (!mUsb.isAvail())
 			return false;
 
-		__switchMode(SET_MODE);
+		//__switchMode(SET_MODE);
 		byte[] ret = __eraseCalInfo();
-		__switchMode(TOUCH_MODE);
+		//__switchMode(TOUCH_MODE);
 		if (ret == null)
 			return false;
 
@@ -534,12 +535,12 @@ public class Function extends Constant {
 
 	}
 
-	public boolean writeCalInfo(CalInfo info) {
+	public boolean writeCalInfo(CalInfo info, int flag) {
 		if (!mUsb.isAvail())
 			return false;
-		__switchMode(SET_MODE);
-		byte[] ret = __writeCalInfo(info);
-		__switchMode(TOUCH_MODE);
+		//__switchMode(SET_MODE);
+		byte[] ret = __writeCalInfo(info, flag);
+		//__switchMode(TOUCH_MODE);
 		if (ret == null)
 			return false;
 
@@ -596,7 +597,7 @@ public class Function extends Constant {
 		BoardConfig read_ic = new BoardConfig(Constant.READ_FROM_IC);
 		read_ic.setBuffer(buf);
 		read_ic.setSize(size);
-
+		
 		return read_ic;
 	}
 
@@ -604,14 +605,15 @@ public class Function extends Constant {
 		if (!mUsb.isAvail())
 			return null;
 
-		__switchMode(SET_MODE);
+		//__switchMode(SET_MODE);
 		byte[] ret = __readCalPoint();
-		__switchMode(TOUCH_MODE);
+		//__switchMode(TOUCH_MODE);
 		if (ret == null || ret.length < 4)
 			return null;
 
 		float x = ret[0] & 0xff | (ret[1] & 0xff) << 8;
 		float y = ret[2] & 0xff | (ret[3] & 0xff) << 8;
+		ComFunc.log("(x" + x + "," + y + ")");
 		return new PointF(x, y);
 
 	}

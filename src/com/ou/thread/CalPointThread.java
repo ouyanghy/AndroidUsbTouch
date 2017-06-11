@@ -13,6 +13,7 @@ public class CalPointThread extends Thread {
 	private Handler mHandler;
 	long mTime = 0;
 	Object mLock;
+	int mSuccTime = 0;
 	public boolean getWorkState() {
 		synchronized (mLock) {
 			return bWork;	
@@ -37,8 +38,11 @@ public class CalPointThread extends Thread {
 			mFunc = Function.getTpUsbFunction();
 			PointF point = mFunc.readCalPoint();
 			if (point != null) {
-				mHandler.obtainMessage(Constant.MSG_GET_CAL_POINT, point).sendToTarget();
-				break;
+				
+				if (mSuccTime++ > 6) {
+					mHandler.obtainMessage(Constant.MSG_GET_CAL_POINT, point).sendToTarget();
+					break;
+				}
 			}
 			
 			ComFunc.sleep(100);

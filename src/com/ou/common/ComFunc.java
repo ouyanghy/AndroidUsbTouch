@@ -91,11 +91,12 @@ public class ComFunc {
 	
 	public static byte [] intsToBytes(int [] src) {
 		byte [] bs = new byte[src.length * 4];
-		for (int i = 0; i < src.length; i++) {
-			bs[i + 0] = (byte) (src[i] & 0xff);
-			bs[i + 1] = (byte) (((src[i] & 0xff00)>>8) & 0xff);
-			bs[i + 2] = (byte) (((src[i] & 0xff0000)>>16) & 0xff);
-			bs[i + 3] = (byte) (((src[i] & 0xff000000)>>24) & 0xff);
+		ComFunc.memset(bs, 0x00, bs.length);
+		for (int i = 0; i < src.length ; i++) {
+			bs[i * 4 + 0] = (byte) (src[i] & 0xff);
+			bs[i * 4 + 1] = (byte) (((src[i] & 0xff00)>>8) & 0xff);
+			bs[i * 4 + 2] = (byte) (((src[i]  & 0xff0000)>>16) & 0xff);
+			bs[i * 4 + 3] = (byte) (((src[i]  & 0xff000000)>>24) & 0xff);
 			
 		}
 		return bs;

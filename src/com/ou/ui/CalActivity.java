@@ -210,22 +210,45 @@ public class CalActivity extends Activity implements OnClickListener {
 	}
 	
 	private boolean updateCalInfo(byte [] ps) {
-		if (DetectUsbThread.isUsbEnable())
+		if (DetectUsbThread.isUsbEnable() == false)
 			return false;
 		boolean r;
 		Function func = DetectUsbThread.getUsbFunction();
-		CalInfo cal = func.readCalInfo();
-		if (cal == null)
+		r = func.switchMode(Constant.SET_MODE);
+		if (r == false) {
+			ComFunc.log("set touch error");
 			return false;
+		}
 		
+		CalInfo cal = func.readCalInfo();
+		if (cal == null) {
+			ComFunc.log("read cal error");
+			return false;
+		}
+		cal.toString();
 		cal.setCalPoints(ps);
 		
 		r = func.eraseCalInfo();
-		if (r == false)
+		if (r == false) {
+			ComFunc.log("erase cal error");
 			return false;
+		}
 		
-		r = func.writeCalInfo(cal);
+		r = func.writeCalInfo(cal,0x4d415452);
+		if (r == false) {
+			ComFunc.log("write cal error");
+		}
 		
+		cal = func.readCalInfo();
+		if (cal == null) {
+			ComFunc.log("read after cal error");
+			return false;
+		}
+		cal.toString();
+		r = func.switchMode(Constant.TOUCH_MODE);
+		if (r == false) {
+			ComFunc.log("set touch error");
+		}
 		return r;
 	}
 	private Handler mHandler = new Handler(new Callback() {
@@ -241,6 +264,7 @@ public class CalActivity extends Activity implements OnClickListener {
 					mStep = 3;
 					ComFunc.log("step is out of boundary");
 				}
+				ComFunc.sleep(100);
 				mPointCal[mStep] = p;
 				//mTv.setText("cal point(" + p.x + "," + p.y + "");
 				setAllVisiable(false);
@@ -269,13 +293,18 @@ public class CalActivity extends Activity implements OnClickListener {
 					if (bs == null) {
 						mTv.setOnClickListener(mApp);
 						mTv.setText(ComFunc.getString(mApp, R.string.cal_err));
+						ComFunc.log("calcuteResult error");
 						break;
 					}
 					boolean r = updateCalInfo(bs);
 					if (r == false) {
 						mTv.setText(ComFunc.getString(mApp, R.string.cal_err));
-					}else
+						ComFunc.log("updateCalInfo error");
+					}else {
+						ComFunc.log("updateCalInfo succ");
 						mTv.setText(ComFunc.getString(mApp, R.string.cal_touch_exit));
+						
+					}
 					mTv.setOnClickListener(mApp);
 					break;
 				}

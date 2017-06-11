@@ -53,6 +53,7 @@ public class MainActivity extends Activity implements  CallBack {
 		mDetectThread = new DetectUsbThread(getApplicationContext(), this);
 		mDetectThread.start();
 		ComFunc.log("demo onCreate");
+	//	test();
 	}
 
 	private void addItem() {
@@ -312,5 +313,26 @@ public class MainActivity extends Activity implements  CallBack {
 		}
 
 	}
+	
+	/*public void test() {
+		
+		new Thread(new Runnable() {
+			 int time = 0;
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				while (true) {
+					if (time++ > 1000)
+						break;
+					ComFunc.sleep(100);
+					mFunc = DetectUsbThread.getUsbFunction();
+					if (mFunc == null)
+						continue;
+					
+					mFunc.readCalPoint();
+				}
+			}
+		}).start();
+	}*/
 
 }

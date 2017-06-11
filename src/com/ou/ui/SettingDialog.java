@@ -91,7 +91,7 @@ public class SettingDialog extends Dialog implements OnClickListener {
 			}
 		}
 
-		return null;
+		return conf;
 
 	}
 
@@ -205,7 +205,7 @@ public class SettingDialog extends Dialog implements OnClickListener {
 		ComFunc.sleep(20);
 		// dir = mSpinnerOre.getSelectedItemPosition();
 
-		r = mFunc.writeCalInfo(info);
+		r = mFunc.writeCalInfo(info,0x434F4E46);
 		if (r == false) {
 			ComFunc.sendMessage(Constant.MSG_WRITE_CAL_INFO_ERR, getContext());
 			return false;

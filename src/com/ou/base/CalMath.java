@@ -15,13 +15,22 @@ public class CalMath {
 		PointF[] calps = transferCalPoint(calP);
 		PointF[] screenps = transferScreenPoint(screenP, width, height);
 		int [] rcv = new int[8];
+		
+		
 		boolean r = CalEquation(calps, screenps, rcv);
 		if (r == false) {
 			ComFunc.log("CalEquation error");
 			return null;
 		}
+		for (int i = 0; i < 8; i++) {
+			ComFunc.log("getResult log int val:" + rcv[i]);
+		}
+		
 		
 		byte [] ret = ComFunc.intsToBytes(rcv);
+		for (int i = 0; i < 32; i++) {
+			ComFunc.log("getResult log byte val:" + ret[i]);
+		}
 		return ret;
 	}
 	public PointF[] transferCalPoint(PointF[] calP) {

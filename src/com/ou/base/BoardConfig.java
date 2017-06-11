@@ -163,6 +163,7 @@ public class BoardConfig extends Constant {
 
 	public void setBuffer(byte[] buf) {
 		mBuffer = buf;
+		parse();
 	}
 
 	public void setSize(int size) {

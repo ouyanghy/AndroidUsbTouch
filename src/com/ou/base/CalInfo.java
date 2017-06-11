@@ -55,7 +55,7 @@ public class CalInfo {
     }
     
     public void parse(byte bs[]) {
-		ComFunc.memcmp(mCalPoints, bs, mCalPoints.length);
+		ComFunc.memcpy(mCalPoints, bs, mCalPoints.length);
 		
 		mScreenDirection = bs [CMD_START_INDEX];
 		mOsSupport = bs[CMD_START_INDEX + 1];
@@ -108,6 +108,8 @@ public class CalInfo {
     			String.format("%x",mCheckFlag) + "," +
     			String.format("%x",mMatrixFlag);
     	
+    	toByte();
+    	ComFunc.log(s + "\nbuffer\n", mBuffer, mBuffer.length);
     	return s;
     }
 }
