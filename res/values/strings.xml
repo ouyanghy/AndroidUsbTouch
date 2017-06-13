@@ -17,6 +17,8 @@
     <string name="fw_info">版本号:</string>
     <string name="msg_file_not_permission">没有访问文件权限</string>
      <string name="msg_exit_retry_again">退出重试</string>
+       <string name="import_config">导入配置文件</string>
+        <string name="msg_import_config_err">配置文件文件导入错误,请确认格式是否正确</string>
     <string-array name="screen_size">
         <item>67(256*128)</item>
     </string-array>

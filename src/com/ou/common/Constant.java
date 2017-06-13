@@ -3,10 +3,12 @@ package com.ou.common;
 public class Constant {	
 	public static final int ITEM_VERSION 		= 0;
 	public static final int ITEM_SETTING 		= 1;
-	public static final int ITEM_KEY 			= 2;
-	public static final int ITEM_HARDWARETEST 	= 3;
-	public static final int ITEM_CALIB 			= 4;
-	public static final int ITEM_UPGRADE 		= 5;
+	
+	public static final int ITEM_HARDWARETEST 	= 2;
+	public static final int ITEM_CALIB 			= 3;
+	public static final int ITEM_UPGRADE 		= 4;
+	public static final int ITEM_KEY 			= 5;
+	
 	public static final String ITEM_KEY_TEXT 		= "text item key";
 	public static final String ITEM_KEY_IMG 		= "img item key";
 	public static final int VID = 0x0AC8;
@@ -127,6 +129,7 @@ public class Constant {
 	public static final int MSG_FILE_NO_PERMISSION = 55;
 	public static final int MSG_DO_NOT_DETACH = 56;
 	public static final int MSG_DEVICE_NOT_FOUND = 57;
+	public static final int MSG_IMPORT_CONFIG_FAIL = 58;
 	
 	public static final int [] BOARD_CONFIG_SIZE = {
 		100,23,37,47,65,67,77,66

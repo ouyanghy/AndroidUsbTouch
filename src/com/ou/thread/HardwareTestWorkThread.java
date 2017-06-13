@@ -20,7 +20,7 @@ public class HardwareTestWorkThread extends Thread {
 	public HardwareTestWorkThread(Handler handler, BoardConfig conf) {
 		// TODO Auto-generated constructor stub
 		mHandler = handler;
-		mFunc = DetectUsbThread.getUsbFunction();
+		mFunc = Function.getTpUsbFunction();
 		if (mFunc == null)
 			bWork = false;
 
@@ -28,7 +28,7 @@ public class HardwareTestWorkThread extends Thread {
 	}
 
 	private HardwareSignal fillAllSignal() {
-		mFunc = DetectUsbThread.getUsbFunction();
+		mFunc = Function.getTpUsbFunction();
 		HardwareSignal signal = new HardwareSignal(mBoardConfig);
 		for (int dir = 0; dir < Constant.LED_EMIT_DIRECTION_TOTAL_NUM; dir++) {
 			byte [] bs = mFunc.readImage(dir, mBoardConfig.getTotalLedNumber());

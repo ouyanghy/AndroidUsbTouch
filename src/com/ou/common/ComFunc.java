@@ -111,6 +111,14 @@ public class ComFunc {
 		}
 	}
 	
+	public static int powerOfNum(int v, int n) {
+		int r = 1;
+		for (int i = 0; i < n; i++)
+			r *= v;
+		
+		return r;
+	}
+	
 	public static String getString(Context context, int id) {
 			return context.getResources().getString(id);
 	}

@@ -90,7 +90,7 @@ public class UpgradeThread extends Thread {
 		}
 			
 
-		mFunc = DetectUsbThread.getUsbFunction();
+		mFunc = Function.getTpUsbFunction();
 		
 		boolean ret = false;
 
@@ -115,7 +115,7 @@ public class UpgradeThread extends Thread {
 
 	public UpgradeThread(Context context, Intent data) {
 		mData = data;
-		mFunc = DetectUsbThread.getUsbFunction();
+		mFunc = Function.getTpUsbFunction();
 		mContext = context;
 		mHandler = new UIMessageHandler();
 	}

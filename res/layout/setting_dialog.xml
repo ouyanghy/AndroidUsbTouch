@@ -23,12 +23,27 @@
         android:layout_height="2dp"
         android:background="#CCCCCC" />
 
-    <Spinner
-        android:id="@+id/spinnerScreenSize"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:entries="@array/screen_size" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
+
+        <Spinner
+            android:id="@+id/spinnerScreenSize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_weight="1"
+            android:entries="@array/screen_size" />
+
+        <Button
+            android:layout_marginTop="8dp"
+            android:id="@+id/buttonImportConfig"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/import_config" />
+
+    </LinearLayout>
 
     <TextView
            android:layout_marginTop="8dp"

@@ -215,9 +215,9 @@ public class Function extends Constant {
 		return ret;
 	}
 
-	private byte[] __writeCalInfo(CalInfo info, int flag) {
+	private byte[] __writeCalInfo(CalInfo info) {
 		info.setCheckFlag(0x434F4E46);
-		info.setMatrixFlag(flag);
+		//info.setMatrixFlag(flag);
 		byte[] data = info.toByte();
 		int addr = CALIB_INFO_ADDR | EXTERNAL_FLASH_ADDRESS;
 		int data_len = info.getSize();
@@ -233,18 +233,18 @@ public class Function extends Constant {
 		return ret;
 	}
 
-	private byte[] __eraseBroadInfo() {
+	private byte[] __eraseBoardInfo() {
 		int addr = BOARD_INFO_ADDR | EXTERNAL_FLASH_ADDRESS;
 
 		byte[] head = getEraseHead(addr, 1);
 		if (head == null) {
-			ComFunc.log("erase broadinfo fail");
+			ComFunc.log("erase Boardinfo fail");
 			return null;
 		}
 
 		byte[] ret = mUsb.sendCommand(head, head.length);
 		if (ret == null) {
-			ComFunc.log("erase broadinfo sendCommand fail");
+			ComFunc.log("erase Boardinfo sendCommand fail");
 			return null;
 		}
 
@@ -255,7 +255,7 @@ public class Function extends Constant {
 		return ret;
 	}
 
-	private byte[] __writeBroadInfo(BoardConfig con) {
+	private byte[] __writeBoardInfo(BoardConfig con) {
 		/* write config */
 
 		byte[] config = con.getBuffer();
@@ -282,7 +282,7 @@ public class Function extends Constant {
 		return ret;
 	}
 
-	private byte[] __readBroadInfo() {
+	private byte[] __readBoardInfo() {
 		int addr = 0;
 		int addr_start = (BOARD_INFO_ADDR + 4) | EXTERNAL_FLASH_ADDRESS;
 		int len = 146;
@@ -443,7 +443,7 @@ public class Function extends Constant {
 		return ret;
 	}
 
-	private int __readBroadInfoScreenSize() {
+	private int __readBoardInfoScreenSize() {
 		if (!mUsb.isAvail())
 			return -1;
 
@@ -535,11 +535,11 @@ public class Function extends Constant {
 
 	}
 
-	public boolean writeCalInfo(CalInfo info, int flag) {
+	public boolean writeCalInfo(CalInfo info) {
 		if (!mUsb.isAvail())
 			return false;
 		//__switchMode(SET_MODE);
-		byte[] ret = __writeCalInfo(info, flag);
+		byte[] ret = __writeCalInfo(info);
 		//__switchMode(TOUCH_MODE);
 		if (ret == null)
 			return false;
@@ -547,23 +547,23 @@ public class Function extends Constant {
 		return true;
 	}
 
-	public boolean eraseBroadInfo() {
+	public boolean eraseBoardInfo() {
 		if (!mUsb.isAvail())
 			return false;
 		__switchMode(SET_MODE);
-		byte[] ret = __eraseBroadInfo();
+		byte[] ret = __eraseBoardInfo();
 		__switchMode(TOUCH_MODE);
 		if (ret == null)
 			return false;
 		return true;
 	}
 
-	public boolean writeBroadInfo(BoardConfig con) {
+	public boolean writeBoardInfo(BoardConfig con) {
 		if (!mUsb.isAvail())
 			return false;
 
 		__switchMode(SET_MODE);
-		byte[] ret = __writeBroadInfo(con);
+		byte[] ret = __writeBoardInfo(con);
 		__switchMode(TOUCH_MODE);
 		if (ret == null)
 			return false;
@@ -571,25 +571,25 @@ public class Function extends Constant {
 		return true;
 	}
 
-	public int readBroadInfoScreenSize() {
+	public int readBoardInfoScreenSize() {
 		__switchMode(SET_MODE);
-		int size = __readBroadInfoScreenSize();
+		int size = __readBoardInfoScreenSize();
 		__switchMode(TOUCH_MODE);
 		return size;
 	}
 
-	public BoardConfig readBroadInfo() {
+	public BoardConfig readBoardInfo() {
 		if (!mUsb.isAvail())
 			return null;
 
-		int size = readBroadInfoScreenSize();
+		int size = readBoardInfoScreenSize();
 		if (size < 0) {
 			ComFunc.log("get size fail");
 			return null;
 		}
 		// Common.log("===size:" + size);
 		ComFunc.sleep(20);
-		byte[] buf = __readBroadInfo();
+		byte[] buf = __readBoardInfo();
 		if (buf == null) {
 			return null;
 		}

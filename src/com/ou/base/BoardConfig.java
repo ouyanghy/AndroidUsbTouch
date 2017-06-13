@@ -6,10 +6,11 @@ import com.ou.common.Constant;
 public class BoardConfig extends Constant {
 	int mSize;
 	String mTitle;
+	String mKey;
 	byte mBuffer[];
 	/* 16 board,4 size */
 	private OneBoard [] mBoardMap;
-	int mIndex = 0;
+	int mIndex = -1;
 	int mXLedNum = -1;
 	int mYLedNum = -1;
 	int mLedTotal = -1;
@@ -76,6 +77,7 @@ public class BoardConfig extends Constant {
 	}
 
 	public BoardConfig(int index) {
+		mBuffer = new byte[71 * 2];
 		if (index == READ_FROM_IC)
 			return;
 
@@ -83,7 +85,8 @@ public class BoardConfig extends Constant {
 		mTitle = BOARD_CONFIG_TITLE[index];
 		mIndex = index;
 		mBoardMap = new OneBoard[Constant.BOARD_MAX];
-
+	
+		
 		switch (index) {
 		case 0:
 			mBuffer = BOARD_CONFIG_0;
@@ -115,12 +118,21 @@ public class BoardConfig extends Constant {
 		parse();
 	}
 
+
+	public String getKey() {
+		return mKey;
+	}
+	
 	public byte[] getBuffer() {
 		return mBuffer;
 	}
 
 	public String getTitle() {
 		return mTitle;
+	}
+	
+	public void setTitle(String s) {
+		mTitle = s;
 	}
 
 	public int getSize() {
@@ -161,6 +173,15 @@ public class BoardConfig extends Constant {
 		return bcmp & scmp;
 	}
 
+	public void setEmitBuffer(byte [] emit) {
+		ComFunc.memcpy(mBuffer, emit, emit.length);
+	}
+	
+	public void setRcvBuffer(byte [] rcv) {
+		ComFunc.memcpy(mBuffer, rcv, 71, 0, rcv.length);
+		parse();
+	}
+	
 	public void setBuffer(byte[] buf) {
 		mBuffer = buf;
 		parse();
@@ -173,6 +194,10 @@ public class BoardConfig extends Constant {
 	public void setIndex(int i) {
 		mIndex = i;
 	}
+	public void setKey(String s) {
+		mKey = s;
+	}
+	
 
 	public int getBoardNum() {
 		return mBoardNum;

@@ -7,7 +7,6 @@ import com.ou.base.ShortCutReport;
 import com.ou.common.ComFunc;
 import com.ou.common.Constant;
 import com.ou.thread.CalPointThread;
-import com.ou.thread.DetectUsbThread;
 import com.ou.usbtp.R;
 import com.ou.view.ShortCutView;
 
@@ -22,9 +21,9 @@ import android.os.Message;
 import android.util.SparseArray;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.Window;
 import android.view.WindowManager;
-import android.view.View.OnClickListener;
 import android.widget.Button;
 
 
@@ -89,7 +88,7 @@ public class ShortCutActivity extends Activity implements OnClickListener,KeyCnt
 	}
 	
 	PointF getCalPoint() {
-		Function func = DetectUsbThread.getUsbFunction();
+		Function func = Function.getTpUsbFunction();;
 		return func.readCalPoint();
 	}
 	@Override
@@ -197,7 +196,7 @@ public class ShortCutActivity extends Activity implements OnClickListener,KeyCnt
 	}
 
 	boolean writeToIc() {
-		Function mFunc  = DetectUsbThread.getUsbFunction();
+		Function mFunc  = Function.getTpUsbFunction();
 		byte [] data = mReport.toBytes();
 		if (data == null) {
 			return false;

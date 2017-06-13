@@ -196,6 +196,10 @@ public class UIMessageHandler extends Handler {
 		case Constant.MSG_DEVICE_NOT_FOUND:
 			notice(context, R.string.msg_device_no_found, true);
 			break;	
+			
+		case Constant.MSG_IMPORT_CONFIG_FAIL:
+			notice(context, R.string.msg_import_config_err, true);
+			break;	
 		}
 	}
 }

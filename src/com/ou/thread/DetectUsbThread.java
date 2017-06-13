@@ -87,10 +87,10 @@ public class DetectUsbThread extends Thread {
 		return true;
 	}
 
-	public static Function getUsbFunction() {
+/*	public static Function getUsbFunction() {
 		return mFunc;
 	}
-
+*/
 	private void deviceInit() {
 		if (mUsb == null)
 			mUsb = new Device(mContext);

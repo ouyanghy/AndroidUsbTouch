@@ -71,11 +71,8 @@ public class MainActivity extends Activity implements  CallBack {
 		map.put(Constant.ITEM_KEY_IMG, R.drawable.setting);
 		map.put(Constant.ITEM_KEY_TEXT, ComFunc.getString(mApp, R.string.button_setting));
 		lstImageItem.add(map);
-		
-		map = new HashMap<String, Object>();
-		map.put(Constant.ITEM_KEY_IMG, R.drawable.key);
-		map.put(Constant.ITEM_KEY_TEXT, ComFunc.getString(mApp, R.string.button_key));
-		lstImageItem.add(map);
+	
+	
 		
 		map = new HashMap<String, Object>();
 		map.put(Constant.ITEM_KEY_IMG, R.drawable.hardwaretest);
@@ -92,6 +89,13 @@ public class MainActivity extends Activity implements  CallBack {
 		map.put(Constant.ITEM_KEY_TEXT,  ComFunc.getString(mApp, R.string.button_upgrade));
 		lstImageItem.add(map);
 
+		/*
+		map = new HashMap<String, Object>();
+		map.put(Constant.ITEM_KEY_IMG, R.drawable.key);
+		map.put(Constant.ITEM_KEY_TEXT, ComFunc.getString(mApp, R.string.button_key));
+		lstImageItem.add(map);
+		 */
+		
 		SimpleAdapter saImageItems = new SimpleAdapter(this, 
 				lstImageItem, 
 				R.layout.grid_item,
@@ -151,7 +155,7 @@ public class MainActivity extends Activity implements  CallBack {
 			if (!bNormalMode)
 				return;
 
-			mFunc = DetectUsbThread.getUsbFunction();
+			mFunc = Function.getTpUsbFunction();
 			int v = mFunc.getFramewareIntId();
 			if (v <= 0) {
 				ComFunc.sendMessage(Constant.MSG_DEVICE_GET_FW_ID_FAIL, this);
@@ -166,19 +170,21 @@ public class MainActivity extends Activity implements  CallBack {
 			if (!bNormalMode)
 				return;
 
-			mFunc = DetectUsbThread.getUsbFunction();
-			SettingDialog d = new SettingDialog(this, mFunc);
-			d.show();
+			mFunc = Function.getTpUsbFunction();
+		/*	SettingDialog d = new SettingDialog(this, mFunc);
+			d.setOwnerActivity(this);
+			d.show();*/
 
+			startActivity(new Intent(this, SettingActivity.class));
 			break;
 
 		case Constant.ITEM_HARDWARETEST:
 			if (!bNormalMode)
 				return;
 
-			mFunc = DetectUsbThread.getUsbFunction();
-			byte[] bs = mFunc.readBroadInfo().getBuffer();
-			int size = mFunc.readBroadInfoScreenSize();
+			mFunc = Function.getTpUsbFunction();
+			byte[] bs = mFunc.readBoardInfo().getBuffer();
+			int size = mFunc.readBoardInfoScreenSize();
 
 			Intent intent = new Intent(this, HardwareTestAcitivity.class);
 			intent.putExtra(Constant.INTENT_BUFF, bs);

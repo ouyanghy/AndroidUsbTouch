@@ -213,7 +213,7 @@ public class CalActivity extends Activity implements OnClickListener {
 		if (DetectUsbThread.isUsbEnable() == false)
 			return false;
 		boolean r;
-		Function func = DetectUsbThread.getUsbFunction();
+		Function func = Function.getTpUsbFunction();
 		r = func.switchMode(Constant.SET_MODE);
 		if (r == false) {
 			ComFunc.log("set touch error");
@@ -221,11 +221,14 @@ public class CalActivity extends Activity implements OnClickListener {
 		}
 		
 		CalInfo cal = func.readCalInfo();
+		
 		if (cal == null) {
 			ComFunc.log("read cal error");
 			return false;
 		}
-		cal.toString();
+		cal.setMatrixFlag(0x4d415452);
+		
+	//	cal.toString();
 		cal.setCalPoints(ps);
 		
 		r = func.eraseCalInfo();
@@ -234,7 +237,8 @@ public class CalActivity extends Activity implements OnClickListener {
 			return false;
 		}
 		
-		r = func.writeCalInfo(cal,0x4d415452);
+		
+		r = func.writeCalInfo(cal);
 		if (r == false) {
 			ComFunc.log("write cal error");
 		}
@@ -244,7 +248,7 @@ public class CalActivity extends Activity implements OnClickListener {
 			ComFunc.log("read after cal error");
 			return false;
 		}
-		cal.toString();
+		//cal.toString();
 		r = func.switchMode(Constant.TOUCH_MODE);
 		if (r == false) {
 			ComFunc.log("set touch error");
